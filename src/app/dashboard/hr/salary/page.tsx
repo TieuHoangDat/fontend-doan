@@ -415,7 +415,7 @@ export default function SalaryPage() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
                 <YAxis />
-                <Tooltip formatter={(value: number) => formatCurrency(value) + ' VNĐ'} />
+                <Tooltip formatter={(value: any) => formatCurrency(value) + ' VNĐ'} />
                 <Bar dataKey="salary" fill="#3b82f6" />
               </BarChart>
             </ResponsiveContainer>
@@ -484,7 +484,7 @@ export default function SalaryPage() {
                         <Cell key={`cell-${index}`} fill={['#3b82f6', '#10b981', '#f59e0b', '#ef4444'][index % 4]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value: number) => formatCurrency(value) + ' VNĐ'} />
+                    <Tooltip formatter={(value: any) => formatCurrency(value) + ' VNĐ'} />
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>
