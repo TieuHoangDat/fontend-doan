@@ -1,20 +1,25 @@
 // src/app/api/[...path]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:3000';
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_BASE || 'https://tieuhoangdat.xyz';
+
+// ✅ Helper function để thêm CORS headers
+function corsHeaders(response: NextResponse) {
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  response.headers.set('Access-Control-Max-Age', '86400');
+  return response;
+}
 
 async function handleRequest(request: NextRequest, params: Promise<{ path: string[] }>) {
   const { path: pathSegments } = await params;
   const path = pathSegments.join('/');
-  // Remove leading slash if exists to avoid double slashes
-  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
-  const url = `${BACKEND_URL}/${cleanPath}${request.nextUrl.search}`;
+  const url = `${BACKEND_URL}/${path}${request.nextUrl.search}`;
 
-  // LOG ĐỂ DEBUG
-  console.log(`[PROXY] ${request.method} /api/${path} → ${url}`);
+  console.log(`[PROXY] ${request.method} → ${url}`);
 
   try {
-    // Copy headers
     const headers: Record<string, string> = {};
     request.headers.forEach((value, key) => {
       if (!['host', 'connection', 'content-length'].includes(key.toLowerCase())) {
@@ -22,42 +27,59 @@ async function handleRequest(request: NextRequest, params: Promise<{ path: strin
       }
     });
 
-    // Get body if exists
     let body: string | undefined;
     if (['POST', 'PUT', 'PATCH'].includes(request.method)) {
       const text = await request.text();
       body = text || undefined;
     }
 
-    // Forward request to backend
+    // ✅ Thêm timeout để tránh hang
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout
+
     const response = await fetch(url, {
       method: request.method,
       headers,
       body,
+      signal: controller.signal,
     });
 
-    // Get response data
+    clearTimeout(timeoutId);
+
     const responseData = await response.text();
 
-    // Create response
     const res = new NextResponse(responseData, {
       status: response.status,
       statusText: response.statusText,
     });
 
-    // Copy response headers
+    // ✅ Copy headers từ backend
     response.headers.forEach((value, key) => {
       res.headers.set(key, value);
     });
 
-    return res;
+    // ✅ Thêm CORS headers
+    return corsHeaders(res);
   } catch (error: any) {
-    console.error('Proxy error:', error);
-    return NextResponse.json(
-      { message: 'Backend connection failed', error: error.message },
-      { status: 500 }
+    console.error('[PROXY ERROR]:', error);
+    
+    // ✅ Trả về lỗi với CORS headers
+    const errorResponse = NextResponse.json(
+      { 
+        message: 'Backend connection failed', 
+        error: error.name === 'AbortError' ? 'Request timeout' : error.message 
+      },
+      { status: error.name === 'AbortError' ? 504 : 500 }
     );
+    
+    return corsHeaders(errorResponse);
   }
+}
+
+// ✅ Handle OPTIONS request (preflight)
+export async function OPTIONS() {
+  const response = new NextResponse(null, { status: 204 });
+  return corsHeaders(response);
 }
 
 export async function GET(req: NextRequest, context: { params: Promise<{ path: string[] }> }) {
@@ -78,15 +100,4 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ path:
 
 export async function DELETE(req: NextRequest, context: { params: Promise<{ path: string[] }> }) {
   return handleRequest(req, context.params);
-}
-
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
 }
