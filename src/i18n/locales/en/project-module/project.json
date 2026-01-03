@@ -1,0 +1,112 @@
+{
+    "project": {
+      "title": "Projects",
+      "allProjects": "All Projects",
+      "createProject": "Create New Project",
+      "editProject": "Edit Project",
+      "deleteProject": "Delete Project",
+      "projectDetails": "Project Details",
+      "noProjects": "No projects available",
+      "loading": "Loading projects...",
+      "loadingData": "Loading data...",
+      
+      "form": {
+        "projectKey": "Project Key",
+        "projectKeyPlaceholder": "e.g., PROJ",
+        "projectKeyRequired": "Please enter project key",
+        "projectKeyMin": "Project key must be at least 2 characters",
+        "projectKeyMax": "Project key must not exceed 10 characters",
+        "projectKeyPattern": "Project key can only contain uppercase letters and numbers",
+        "projectKeyTooltip": "Short code to identify the project (e.g., PROJ, ERP, WEB)",
+        "projectName": "Project Name",
+        "projectNamePlaceholder": "e.g., ERP Management System",
+        "projectNameRequired": "Please enter project name",
+        "projectNameMax": "Project name must not exceed 255 characters",
+        "description": "Project Description",
+        "descriptionPlaceholder": "Brief description of the project...",
+        "lead": "Project Lead",
+        "leadRequired": "Please select project lead",
+        "leadTooltip": "Person responsible for the project",
+        "leadPlaceholder": "Select project lead",
+        "permissionScheme": "Permission Scheme",
+        "permissionSchemeRequired": "Please select permission scheme",
+        "permissionSchemeTooltip": "Defines permissions and roles in the project",
+        "permissionSchemePlaceholder": "Select permission scheme",
+        "notificationScheme": "Notification Scheme",
+        "notificationSchemeRequired": "Please select notification scheme",
+        "notificationSchemeTooltip": "Configure email notifications for events",
+        "notificationSchemePlaceholder": "Select notification scheme",
+        "workflowScheme": "Workflow Scheme",
+        "workflowSchemeRequired": "Please select workflow scheme",
+        "workflowSchemeTooltip": "Define workflow for issue types",
+        "workflowSchemePlaceholder": "Select workflow scheme"
+      },
+      
+      "table": {
+        "projectKey": "Project Key",
+        "projectName": "Project Name",
+        "description": "Description",
+        "noDescription": "No description",
+        "lead": "Lead",
+        "action": "Action",
+        "open": "Open"
+      },
+      
+      "search": {
+        "placeholder": "Search by project key, name, description, or lead...",
+        "found": "Found {{count}} project(s)",
+        "noResults": "No projects found for \"{{query}}\"",
+        "totalProjects": "{{count}} total"
+      },
+      
+      "schemes": {
+        "title": "Scheme Configuration",
+        "description": "Schemes will be copied specifically for this project",
+        "default": "DEFAULT"
+      },
+      
+      "info": {
+        "note": "Note",
+        "createNote": "When creating a project, the system will automatically copy the selected schemes. You will be assigned Admin role in the project and can edit schemes without affecting other projects.",
+        "successMessage": "Project {{projectKey}} has been created successfully!",
+        "roleAssigned": "You have been assigned {{role}} role"
+      },
+      
+      "messages": {
+        "loadFailed": "Failed to load projects",
+        "loadDataFailed": "Cannot load data. Please try again.",
+        "createSuccess": "Project created successfully",
+        "updateSuccess": "Project updated successfully",
+        "deleteFailed": "Failed to delete project",
+        "keyExists": "Project key already exists. Please choose another.",
+        "genericError": "Cannot create project. Please try again."
+      },
+      
+      "buttons": {
+        "create": "Create Project",
+        "update": "Update",
+        "cancel": "Cancel",
+        "close": "Close"
+      },
+      
+      "pagination": {
+        "total": "Total {{count}} projects"
+      }
+    },
+    
+    "projectHeader": {
+      "project": "Project",
+      "lead": "Lead",
+      "viewDetails": "View project details",
+      
+      "tabs": {
+        "summary": "Summary",
+        "sprintBacklog": "Backlog",
+        "board": "Board",
+        "epics": "Epics",
+        "team": "Team",
+        "roles": "Roles & Permissions",
+        "notifications": "Notifications"
+      }
+    }
+  }

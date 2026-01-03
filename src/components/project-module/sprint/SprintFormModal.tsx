@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import {
     Modal,
@@ -11,6 +13,7 @@ import {
     Space,
 } from 'antd';
 import { RocketOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { Sprint } from './sprint.types';
 import { sprintService, CreateSprintDto, UpdateSprintDto } from '@/lib/api/services/project-module/sprint.service';
@@ -34,6 +37,7 @@ export const SprintFormModal: React.FC<SprintFormModalProps> = ({
     onClose,
     onSuccess,
 }) => {
+    const { t } = useTranslation();
     const [form] = Form.useForm();
     const [submitting, setSubmitting] = useState(false);
 
@@ -72,10 +76,10 @@ export const SprintFormModal: React.FC<SprintFormModalProps> = ({
 
             if (isEditing) {
                 await sprintService.update(sprint.id, submitData);
-                message.success('Đã cập nhật sprint');
+                message.success(t('sprint.messages.updateSuccess'));
             } else {
                 await sprintService.create(submitData as CreateSprintDto);
-                message.success('Đã tạo sprint mới');
+                message.success(t('sprint.messages.createSuccess'));
             }
 
             form.resetFields();
@@ -83,9 +87,9 @@ export const SprintFormModal: React.FC<SprintFormModalProps> = ({
         } catch (error: any) {
             console.error('Error saving sprint:', error);
             if (error.response?.status === 400) {
-                message.error(error.response.data.message || 'Dữ liệu không hợp lệ');
+                message.error(error.response.data.message || t('sprint.messages.invalidData'));
             } else {
-                message.error('Không thể lưu sprint');
+                message.error(t('sprint.messages.saveFailed'));
             }
         } finally {
             setSubmitting(false);
@@ -97,7 +101,6 @@ export const SprintFormModal: React.FC<SprintFormModalProps> = ({
         onClose();
     };
 
-    // Auto-calculate duration when dates change
     const handleDateChange = (dates: any) => {
         if (dates && dates[0] && dates[1]) {
             const duration = dates[1].diff(dates[0], 'days');
@@ -111,7 +114,7 @@ export const SprintFormModal: React.FC<SprintFormModalProps> = ({
             title={
                 <Space>
                     <RocketOutlined />
-                    <span>{isEditing ? 'Edit Sprint' : 'Create New Sprint'}</span>
+                    <span>{isEditing ? t('sprint.form.editTitle') : t('sprint.form.title')}</span>
                 </Space>
             }
             onCancel={handleCancel}
@@ -124,30 +127,27 @@ export const SprintFormModal: React.FC<SprintFormModalProps> = ({
                 onFinish={handleSubmit}
                 style={{ marginTop: 16 }}
             >
-                {/* Sprint Name */}
                 <Form.Item
                     name="sprint_name"
-                    label="Sprint Name"
+                    label={t('sprint.form.sprintName')}
                     rules={[
-                        { required: true, message: 'Please enter sprint name' },
-                        { max: 255, message: 'Sprint name cannot exceed 255 characters' },
+                        { required: true, message: t('sprint.form.sprintNameRequired') },
+                        { max: 255, message: t('sprint.form.sprintNameMax') },
                     ]}
                 >
-                    <Input placeholder="e.g., Sprint 1, Alpha Release" maxLength={255} />
+                    <Input placeholder={t('sprint.form.sprintNamePlaceholder')} maxLength={255} />
                 </Form.Item>
 
-                {/* Goal */}
-                <Form.Item name="goal" label="Sprint Goal">
+                <Form.Item name="goal" label={t('sprint.form.sprintGoal')}>
                     <TextArea
                         rows={3}
-                        placeholder="What do you want to achieve in this sprint?"
+                        placeholder={t('sprint.form.sprintGoalPlaceholder')}
                         maxLength={1000}
                         showCount
                     />
                 </Form.Item>
 
-                {/* Date Range */}
-                <Form.Item name="dateRange" label="Sprint Duration">
+                <Form.Item name="dateRange" label={t('sprint.form.duration')}>
                     <RangePicker
                         style={{ width: '100%' }}
                         format="DD/MM/YYYY"
@@ -155,36 +155,33 @@ export const SprintFormModal: React.FC<SprintFormModalProps> = ({
                     />
                 </Form.Item>
 
-                {/* Duration Days */}
                 <Form.Item
                     name="duration_days"
-                    label="Duration (Days)"
-                    help="Auto-calculated from dates or enter manually"
+                    label={t('sprint.form.durationDays')}
+                    help={t('sprint.form.durationHelp')}
                 >
                     <InputNumber
                         min={1}
                         max={365}
-                        placeholder="e.g., 14"
+                        placeholder={t('sprint.form.durationDaysPlaceholder')}
                         style={{ width: '100%' }}
                     />
                 </Form.Item>
 
-                {/* Status */}
-                <Form.Item name="status" label="Status">
-                    <Select placeholder="Select status">
-                        <Option value="planning">Planning</Option>
-                        <Option value="active">Active</Option>
-                        <Option value="completed">Completed</Option>
-                        <Option value="closed">Closed</Option>
+                <Form.Item name="status" label={t('sprint.form.status')}>
+                    <Select placeholder={t('sprint.form.statusPlaceholder')}>
+                        <Option value="planning">{t('sprint.status.planning')}</Option>
+                        <Option value="active">{t('sprint.status.active')}</Option>
+                        <Option value="completed">{t('sprint.status.completed')}</Option>
+                        <Option value="closed">{t('sprint.status.closed')}</Option>
                     </Select>
                 </Form.Item>
 
-                {/* Footer Buttons */}
                 <Form.Item style={{ marginBottom: 0 }}>
                     <Space style={{ float: 'right' }}>
-                        <Button onClick={handleCancel}>Cancel</Button>
+                        <Button onClick={handleCancel}>{t('sprint.buttons.cancel')}</Button>
                         <Button type="primary" htmlType="submit" loading={submitting}>
-                            {isEditing ? 'Update' : 'Create'}
+                            {isEditing ? t('sprint.buttons.update') : t('sprint.buttons.create')}
                         </Button>
                     </Space>
                 </Form.Item>

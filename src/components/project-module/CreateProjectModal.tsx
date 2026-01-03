@@ -1,8 +1,8 @@
-// src/components/project-module/CreateProjectModal.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import { Modal, Form, Input, Select, message, Spin, Alert } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { projectService } from '@/lib/api/services/project-module/project.service';
 import { employeeService } from '@/lib/api/services/project-module/employee.service';
 
@@ -39,6 +39,7 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
   onClose,
   onSuccess,
 }) => {
+  const { t } = useTranslation();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [schemesLoading, setSchemesLoading] = useState(true);
@@ -50,7 +51,6 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
   });
   const [employees, setEmployees] = useState<Employee[]>([]);
 
-  // Load schemes và employees khi modal mở
   useEffect(() => {
     if (open) {
       loadInitialData();
@@ -62,7 +62,6 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       setSchemesLoading(true);
       setEmployeesLoading(true);
 
-      // Load schemes và employees song song
       const [schemesData, employeesData] = await Promise.all([
         projectService.getAllSchemes(),
         employeeService.getAllEmployees(),
@@ -71,9 +70,7 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       setSchemes(schemesData);
       setEmployees(employeesData);
 
-      // Pre-fill form với scheme đầu tiên trong danh sách
       if (schemesData.permissionSchemes.length > 0) {
-        // Ưu tiên scheme có is_default = true, không có thì lấy scheme đầu tiên
         const defaultPermission = schemesData.permissionSchemes.find(s => s.is_default) 
           || schemesData.permissionSchemes[0];
         form.setFieldValue('permission_scheme_id', defaultPermission.id);
@@ -88,7 +85,7 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       }
     } catch (error) {
       console.error('Error loading initial data:', error);
-      message.error('Không thể tải dữ liệu. Vui lòng thử lại.');
+      message.error(t('project.messages.loadDataFailed'));
     } finally {
       setSchemesLoading(false);
       setEmployeesLoading(false);
@@ -111,10 +108,10 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
 
       message.success(
         <div>
-          <div>Dự án <strong>{response.project_key}</strong> đã được tạo thành công!</div>
+          <div>{t('project.info.successMessage', { projectKey: response.project_key })}</div>
           {response.creator_assignment && (
             <div style={{ fontSize: 12, marginTop: 4 }}>
-              Bạn đã được gán quyền <strong>{response.creator_assignment.role}</strong>
+              {t('project.info.roleAssigned', { role: response.creator_assignment.role })}
             </div>
           )}
         </div>
@@ -127,9 +124,9 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       console.error('Error creating project:', error);
       
       if (error.response?.status === 409) {
-        message.error('Mã dự án đã tồn tại. Vui lòng chọn mã khác.');
+        message.error(t('project.messages.keyExists'));
       } else {
-        message.error(error.response?.data?.message || 'Không thể tạo dự án. Vui lòng thử lại.');
+        message.error(error.response?.data?.message || t('project.messages.genericError'));
       }
     } finally {
       setLoading(false);
@@ -148,14 +145,14 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 18 }}>📁</span>
-          <span>Tạo dự án mới</span>
+          <span>{t('project.createProject')}</span>
         </div>
       }
       open={open}
       onOk={() => form.submit()}
       onCancel={handleCancel}
-      okText="Tạo dự án"
-      cancelText="Hủy"
+      okText={t('project.buttons.create')}
+      cancelText={t('project.buttons.cancel')}
       confirmLoading={loading}
       width={600}
       maskClosable={false}
@@ -163,13 +160,13 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
       {isFormLoading ? (
         <div style={{ textAlign: 'center', padding: '40px 0' }}>
           <Spin size="large" />
-          <div style={{ marginTop: 16, color: '#999' }}>Đang tải dữ liệu...</div>
+          <div style={{ marginTop: 16, color: '#999' }}>{t('project.loadingData')}</div>
         </div>
       ) : (
         <>
           <Alert
-            message="Lưu ý"
-            description="Khi tạo dự án, hệ thống sẽ tự động sao chép các schemes đã chọn. Bạn sẽ được gán quyền Admin trong dự án và có thể chỉnh sửa schemes mà không ảnh hưởng đến các dự án khác."
+            message={t('project.info.note')}
+            description={t('project.info.createNote')}
             type="info"
             showIcon
             style={{ marginBottom: 24 }}
@@ -184,20 +181,20 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
             {/* Project Key */}
             <Form.Item
               name="project_key"
-              label="Mã dự án"
+              label={t('project.form.projectKey')}
               rules={[
-                { required: true, message: 'Vui lòng nhập mã dự án' },
-                { min: 2, message: 'Mã dự án phải có ít nhất 2 ký tự' },
-                { max: 10, message: 'Mã dự án không được quá 10 ký tự' },
+                { required: true, message: t('project.form.projectKeyRequired') },
+                { min: 2, message: t('project.form.projectKeyMin') },
+                { max: 10, message: t('project.form.projectKeyMax') },
                 { 
                   pattern: /^[A-Z0-9]+$/, 
-                  message: 'Mã dự án chỉ được chứa chữ cái in hoa và số' 
+                  message: t('project.form.projectKeyPattern')
                 },
               ]}
-              tooltip="Mã ngắn gọn để định danh dự án (VD: PROJ, ERP, WEB)"
+              tooltip={t('project.form.projectKeyTooltip')}
             >
               <Input
-                placeholder="VD: PROJ"
+                placeholder={t('project.form.projectKeyPlaceholder')}
                 maxLength={10}
                 style={{ textTransform: 'uppercase' }}
                 onChange={(e) => {
@@ -209,23 +206,23 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
             {/* Project Name */}
             <Form.Item
               name="project_name"
-              label="Tên dự án"
+              label={t('project.form.projectName')}
               rules={[
-                { required: true, message: 'Vui lòng nhập tên dự án' },
-                { max: 255, message: 'Tên dự án không được quá 255 ký tự' },
+                { required: true, message: t('project.form.projectNameRequired') },
+                { max: 255, message: t('project.form.projectNameMax') },
               ]}
             >
-              <Input placeholder="VD: Hệ thống quản lý ERP" maxLength={255} />
+              <Input placeholder={t('project.form.projectNamePlaceholder')} maxLength={255} />
             </Form.Item>
 
             {/* Project Description */}
             <Form.Item
               name="project_description"
-              label="Mô tả dự án"
+              label={t('project.form.description')}
             >
               <TextArea
                 rows={3}
-                placeholder="Mô tả ngắn về dự án..."
+                placeholder={t('project.form.descriptionPlaceholder')}
                 maxLength={1000}
                 showCount
               />
@@ -234,13 +231,13 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
             {/* Lead Employee */}
             <Form.Item
               name="lead_employee_id"
-              label="Trưởng dự án"
-              rules={[{ required: true, message: 'Vui lòng chọn trưởng dự án' }]}
-              tooltip="Người chịu trách nhiệm chính cho dự án"
+              label={t('project.form.lead')}
+              rules={[{ required: true, message: t('project.form.leadRequired') }]}
+              tooltip={t('project.form.leadTooltip')}
             >
               <Select
                 showSearch
-                placeholder="Chọn trưởng dự án"
+                placeholder={t('project.form.leadPlaceholder')}
                 optionFilterProp="children"
                 filterOption={(input, option) =>
                   (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
@@ -260,21 +257,21 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
               background: '#f5f5f5', 
               borderRadius: 6 
             }}>
-              <div style={{ fontWeight: 500, marginBottom: 4 }}>Cấu hình Schemes</div>
+              <div style={{ fontWeight: 500, marginBottom: 4 }}>{t('project.schemes.title')}</div>
               <div style={{ fontSize: 12, color: '#666' }}>
-                Các schemes sẽ được sao chép riêng cho dự án này
+                {t('project.schemes.description')}
               </div>
             </div>
 
             {/* Permission Scheme */}
             <Form.Item
               name="permission_scheme_id"
-              label="Permission Scheme"
-              rules={[{ required: true, message: 'Vui lòng chọn permission scheme' }]}
-              tooltip="Định nghĩa quyền hạn và vai trò trong dự án"
+              label={t('project.form.permissionScheme')}
+              rules={[{ required: true, message: t('project.form.permissionSchemeRequired') }]}
+              tooltip={t('project.form.permissionSchemeTooltip')}
             >
               <Select
-                placeholder="Chọn permission scheme"
+                placeholder={t('project.form.permissionSchemePlaceholder')}
                 loading={schemesLoading}
                 optionLabelProp="label"
               >
@@ -293,7 +290,7 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
                             color: 'white', 
                             borderRadius: 4 
                           }}>
-                            DEFAULT
+                            {t('project.schemes.default')}
                           </span>
                         )}
                       </div>
@@ -311,7 +308,7 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
                             color: 'white', 
                             borderRadius: 4 
                           }}>
-                            DEFAULT
+                            {t('project.schemes.default')}
                           </span>
                         )}
                       </div>
@@ -329,12 +326,12 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
             {/* Notification Scheme */}
             <Form.Item
               name="notification_scheme_id"
-              label="Notification Scheme"
-              rules={[{ required: true, message: 'Vui lòng chọn notification scheme' }]}
-              tooltip="Cấu hình email thông báo cho các sự kiện"
+              label={t('project.form.notificationScheme')}
+              rules={[{ required: true, message: t('project.form.notificationSchemeRequired') }]}
+              tooltip={t('project.form.notificationSchemeTooltip')}
             >
               <Select
-                placeholder="Chọn notification scheme"
+                placeholder={t('project.form.notificationSchemePlaceholder')}
                 loading={schemesLoading}
                 optionLabelProp="label"
               >
@@ -360,12 +357,12 @@ export const CreateProjectModal: React.FC<CreateProjectModalProps> = ({
             {/* Workflow Scheme */}
             <Form.Item
               name="workflow_scheme_id"
-              label="Workflow Scheme"
-              rules={[{ required: true, message: 'Vui lòng chọn workflow scheme' }]}
-              tooltip="Định nghĩa quy trình làm việc cho các loại issue"
+              label={t('project.form.workflowScheme')}
+              rules={[{ required: true, message: t('project.form.workflowSchemeRequired') }]}
+              tooltip={t('project.form.workflowSchemeTooltip')}
             >
               <Select
-                placeholder="Chọn workflow scheme"
+                placeholder={t('project.form.workflowSchemePlaceholder')}
                 loading={schemesLoading}
                 optionLabelProp="label"
               >

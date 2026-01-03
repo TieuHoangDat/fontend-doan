@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import {
     Modal,
@@ -17,6 +19,7 @@ import {
     CalendarOutlined,
     FileTextOutlined,
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import { epicService, Epic } from '@/lib/api/services/project-module/epic.service';
@@ -54,6 +57,7 @@ export const EpicDetailModal: React.FC<EpicDetailModalProps> = ({
     onClose,
     onEdit,
 }) => {
+    const { t } = useTranslation();
     const [epic, setEpic] = useState<Epic | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -64,7 +68,7 @@ export const EpicDetailModal: React.FC<EpicDetailModalProps> = ({
             setEpic(data);
         } catch (error) {
             console.error('Error fetching epic detail:', error);
-            message.error('Không thể tải chi tiết epic');
+            message.error(t('epic.messages.loadError'));
         } finally {
             setLoading(false);
         }
@@ -91,36 +95,48 @@ export const EpicDetailModal: React.FC<EpicDetailModalProps> = ({
         return 'default';
     };
 
+    const getStatusLabel = (status: string | null) => {
+        if (!status) return t('epic.status.noStatus');
+        const statusMap: Record<string, string> = {
+            'planning': t('epic.status.planning'),
+            'in progress': t('epic.status.inProgress'),
+            'on hold': t('epic.status.onHold'),
+            'done': t('epic.status.done'),
+            'cancelled': t('epic.status.cancelled'),
+        };
+        return statusMap[status.toLowerCase()] || status;
+    };
+
     const issueColumns: ColumnsType<Issue> = [
         {
-            title: 'Issue Code',
+            title: t('epic.details.issueCode'),
             dataIndex: 'issue_code',
             key: 'issue_code',
             width: 120,
             render: (text) => <Text strong>{text}</Text>,
         },
         {
-            title: 'Summary',
+            title: t('epic.details.summary'),
             dataIndex: 'summary',
             key: 'summary',
             ellipsis: true,
         },
         {
-            title: 'Type',
+            title: t('epic.details.type'),
             dataIndex: ['issue_type', 'type_name'],
             key: 'type',
             width: 100,
             render: (text) => <Tag>{text}</Tag>,
         },
         {
-            title: 'Status',
+            title: t('epic.details.issueStatus'),
             dataIndex: ['current_status', 'status_name'],
             key: 'status',
             width: 120,
             render: (text) => <Tag color="blue">{text}</Tag>,
         },
         {
-            title: 'Assignees',
+            title: t('epic.details.assignees'),
             dataIndex: 'assignees',
             key: 'assignees',
             width: 150,
@@ -133,7 +149,7 @@ export const EpicDetailModal: React.FC<EpicDetailModalProps> = ({
                             </Tag>
                         ))
                     ) : (
-                        <Text type="secondary">Unassigned</Text>
+                        <Text type="secondary">{t('epic.details.unassigned')}</Text>
                     )}
                 </Space>
             ),
@@ -146,14 +162,14 @@ export const EpicDetailModal: React.FC<EpicDetailModalProps> = ({
             title={
                 <Space>
                     <FlagOutlined />
-                    <span>Epic Details</span>
+                    <span>{t('epic.epicDetails')}</span>
                 </Space>
             }
             onCancel={onClose}
             width={900}
             footer={[
                 <Button key="close" onClick={onClose}>
-                    Close
+                    {t('epic.buttons.close')}
                 </Button>,
                 <Button
                     key="edit"
@@ -161,7 +177,7 @@ export const EpicDetailModal: React.FC<EpicDetailModalProps> = ({
                     icon={<EditOutlined />}
                     onClick={() => epic && onEdit(epic)}
                 >
-                    Edit Epic
+                    {t('epic.buttons.edit')}
                 </Button>,
             ]}
         >
@@ -175,17 +191,17 @@ export const EpicDetailModal: React.FC<EpicDetailModalProps> = ({
                             </Title>
 
                             <Descriptions bordered column={2} size="small">
-                                <Descriptions.Item label="Project" span={2}>
+                                <Descriptions.Item label={t('epic.form.project')} span={2}>
                                     <Tag color="blue">{epic.project?.project_name}</Tag>
                                 </Descriptions.Item>
 
-                                <Descriptions.Item label="Status" span={2}>
+                                <Descriptions.Item label={t('epic.details.status')} span={2}>
                                     <Tag color={getStatusColor(epic.status)}>
-                                        {epic.status || 'No Status'}
+                                        {getStatusLabel(epic.status)}
                                     </Tag>
                                 </Descriptions.Item>
 
-                                <Descriptions.Item label="Start Date">
+                                <Descriptions.Item label={t('epic.details.startDate')}>
                                     <Space>
                                         <CalendarOutlined />
                                         <Text>
@@ -196,7 +212,7 @@ export const EpicDetailModal: React.FC<EpicDetailModalProps> = ({
                                     </Space>
                                 </Descriptions.Item>
 
-                                <Descriptions.Item label="Due Date">
+                                <Descriptions.Item label={t('epic.details.dueDate')}>
                                     <Space>
                                         <CalendarOutlined />
                                         <Text
@@ -215,11 +231,11 @@ export const EpicDetailModal: React.FC<EpicDetailModalProps> = ({
                                     </Space>
                                 </Descriptions.Item>
 
-                                <Descriptions.Item label="Goal" span={2}>
+                                <Descriptions.Item label={t('epic.details.goal')} span={2}>
                                     {epic.goal ? (
                                         <Paragraph style={{ margin: 0 }}>{epic.goal}</Paragraph>
                                     ) : (
-                                        <Text type="secondary">No goal specified</Text>
+                                        <Text type="secondary">{t('epic.details.noGoal')}</Text>
                                     )}
                                 </Descriptions.Item>
                             </Descriptions>
@@ -228,7 +244,7 @@ export const EpicDetailModal: React.FC<EpicDetailModalProps> = ({
                         {/* Issues Section */}
                         <div>
                             <Title level={5} style={{ marginBottom: 12 }}>
-                                <FileTextOutlined /> Issues ({epic.issues?.length || 0})
+                                <FileTextOutlined /> {t('epic.details.issuesCount', { count: epic.issues?.length || 0 })}
                             </Title>
 
                             {epic.issues && epic.issues.length > 0 ? (
@@ -244,14 +260,14 @@ export const EpicDetailModal: React.FC<EpicDetailModalProps> = ({
                                 />
                             ) : (
                                 <Empty
-                                    description="No issues linked to this epic"
+                                    description={t('epic.details.noIssues')}
                                     style={{ padding: '24px 0' }}
                                 />
                             )}
                         </div>
                     </Space>
                 ) : (
-                    <Empty description="No data" />
+                    <Empty description={t('epic.noData')} />
                 )}
             </Spin>
         </Modal>

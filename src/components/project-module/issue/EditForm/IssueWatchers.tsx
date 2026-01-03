@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import {
     Card,
@@ -16,6 +18,7 @@ import {
     PlusOutlined,
     CloseOutlined,
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { issueService, Employee } from '@/lib/api/services/project-module/issue.service';
 
 const { Option } = Select;
@@ -24,7 +27,7 @@ const { Text } = Typography;
 type IssueWatchersProps = {
     issueId: number;
     projectId?: number;
-    currentEmployeeId?: number; // ID của user hiện tại để highlight
+    currentEmployeeId?: number;
 };
 
 export const IssueWatchers: React.FC<IssueWatchersProps> = ({
@@ -32,15 +35,14 @@ export const IssueWatchers: React.FC<IssueWatchersProps> = ({
     projectId = 1,
     currentEmployeeId,
 }) => {
+    const { t } = useTranslation();
     const [watchers, setWatchers] = useState<Employee[]>([]);
     const [availableEmployees, setAvailableEmployees] = useState<Employee[]>([]);
     const [loading, setLoading] = useState(false);
     const [adding, setAdding] = useState(false);
 
-    // Check if current user is watching
     const isCurrentUserWatching = watchers.some(w => w.id === currentEmployeeId);
 
-    // Fetch watchers
     const fetchWatchers = async () => {
         try {
             setLoading(true);
@@ -48,58 +50,54 @@ export const IssueWatchers: React.FC<IssueWatchersProps> = ({
             setWatchers(data);
         } catch (error) {
             console.error('Error fetching watchers:', error);
-            message.error('Không thể tải danh sách watchers');
+            message.error(t('issue.watchers.loadFailed'));
         } finally {
             setLoading(false);
         }
     };
 
-    // Fetch available employees
     const fetchAvailableEmployees = async () => {
         try {
             const data = await issueService.getProjectEmployees(projectId);
             setAvailableEmployees(data);
         } catch (error) {
             console.error('Error fetching employees:', error);
-            message.error('Không thể tải danh sách nhân viên');
+            message.error(t('issue.watchers.loadEmployeesFailed'));
         }
     };
 
-    // Add watcher
     const handleAddWatcher = async (employeeId: number) => {
         try {
             setAdding(true);
             await issueService.addWatcher(issueId, employeeId);
-            message.success('Đã thêm watcher');
+            message.success(t('issue.watchers.addSuccess'));
             fetchWatchers();
         } catch (error: any) {
             console.error('Error adding watcher:', error);
             if (error.response?.status === 400) {
-                message.warning('Người này đã đang theo dõi issue');
+                message.warning(t('issue.watchers.alreadyWatching'));
             } else {
-                message.error('Không thể thêm watcher');
+                message.error(t('issue.watchers.addFailed'));
             }
         } finally {
             setAdding(false);
         }
     };
 
-    // Remove watcher
     const handleRemoveWatcher = async (employeeId: number) => {
         try {
             await issueService.removeWatcher(issueId, employeeId);
-            message.success('Đã xóa watcher');
+            message.success(t('issue.watchers.removeSuccess'));
             fetchWatchers();
         } catch (error) {
             console.error('Error removing watcher:', error);
-            message.error('Không thể xóa watcher');
+            message.error(t('issue.watchers.removeFailed'));
         }
     };
 
-    // Toggle watch for current user
     const handleToggleWatch = async () => {
         if (!currentEmployeeId) {
-            message.warning('Không xác định được người dùng hiện tại');
+            message.warning(t('issue.watchers.cannotIdentify'));
             return;
         }
 
@@ -107,15 +105,15 @@ export const IssueWatchers: React.FC<IssueWatchersProps> = ({
             setAdding(true);
             if (isCurrentUserWatching) {
                 await issueService.removeWatcher(issueId, currentEmployeeId);
-                message.success('Đã hủy theo dõi issue');
+                message.success(t('issue.watchers.unwatchSuccess'));
             } else {
                 await issueService.addWatcher(issueId, currentEmployeeId);
-                message.success('Đã bắt đầu theo dõi issue');
+                message.success(t('issue.watchers.watchSuccess'));
             }
             fetchWatchers();
         } catch (error) {
             console.error('Error toggling watch:', error);
-            message.error('Không thể thay đổi trạng thái theo dõi');
+            message.error(t('issue.watchers.toggleFailed'));
         } finally {
             setAdding(false);
         }
@@ -128,7 +126,6 @@ export const IssueWatchers: React.FC<IssueWatchersProps> = ({
         }
     }, [issueId]);
 
-    // Filter out already watching employees
     const filteredEmployees = availableEmployees.filter(
         (emp) => !watchers.some((watcher) => watcher.id === emp.id)
     );
@@ -139,20 +136,20 @@ export const IssueWatchers: React.FC<IssueWatchersProps> = ({
             title={
                 <Space>
                     <EyeOutlined />
-                    <Text strong>Watchers</Text>
+                    <Text strong>{t('issue.watchers.title')}</Text>
                     <Tag color="purple">{watchers.length}</Tag>
                 </Space>
             }
             extra={
                 currentEmployeeId && (
-                    <Tooltip title={isCurrentUserWatching ? 'Hủy theo dõi' : 'Theo dõi issue này'}>
+                    <Tooltip title={isCurrentUserWatching ? t('issue.watchers.unwatchTooltip') : t('issue.watchers.watchTooltip')}>
                         <Tag
                             color={isCurrentUserWatching ? 'purple' : 'default'}
                             style={{ cursor: 'pointer' }}
                             onClick={handleToggleWatch}
                         >
                             <EyeOutlined style={{ marginRight: 4 }} />
-                            {isCurrentUserWatching ? 'Đang theo dõi' : 'Theo dõi'}
+                            {isCurrentUserWatching ? t('issue.watchers.watching') : t('issue.watchers.watch')}
                         </Tag>
                     </Tooltip>
                 )
@@ -160,13 +157,12 @@ export const IssueWatchers: React.FC<IssueWatchersProps> = ({
             style={{ marginBottom: 16 }}
         >
             <Spin spinning={loading}>
-                {/* Add Watcher Select */}
                 <Select
                     style={{ width: '100%', marginBottom: 12 }}
                     placeholder={
                         <Space>
                             <PlusOutlined />
-                            <span>Thêm watcher...</span>
+                            <span>{t('issue.watchers.addWatcher')}</span>
                         </Space>
                     }
                     showSearch
@@ -188,11 +184,10 @@ export const IssueWatchers: React.FC<IssueWatchersProps> = ({
                     ))}
                 </Select>
 
-                {/* Watchers List */}
                 <Space direction="vertical" style={{ width: '100%' }} size="small">
                     {watchers.length === 0 ? (
                         <Text type="secondary" style={{ fontSize: 12 }}>
-                            Chưa có ai theo dõi issue này
+                            {t('issue.watchers.noWatchers')}
                         </Text>
                     ) : (
                         watchers.map((watcher) => (
@@ -232,7 +227,7 @@ export const IssueWatchers: React.FC<IssueWatchersProps> = ({
                                             </Text>
                                             {watcher.id === currentEmployeeId && (
                                                 <Tag color="purple" style={{ fontSize: 10, padding: '0 4px' }}>
-                                                    Bạn
+                                                    {t('issue.watchers.you')}
                                                 </Tag>
                                             )}
                                         </Space>
@@ -242,7 +237,7 @@ export const IssueWatchers: React.FC<IssueWatchersProps> = ({
                                         </Text>
                                     </div>
                                 </Space>
-                                <Tooltip title="Xóa watcher">
+                                <Tooltip title={t('issue.watchers.removeWatcher')}>
                                     <CloseOutlined
                                         style={{
                                             cursor: 'pointer',

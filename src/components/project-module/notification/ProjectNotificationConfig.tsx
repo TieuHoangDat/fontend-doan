@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import {
     Card,
@@ -12,10 +14,11 @@ import {
     BellOutlined,
     CheckCircleOutlined,
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { EventGroup } from '@/lib/api/services/project-module/notification-management.service';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 type ProjectNotificationConfigProps = {
     events: EventGroup[];
@@ -32,6 +35,8 @@ export const ProjectNotificationConfig: React.FC<ProjectNotificationConfigProps>
     onRecipientToggle,
     loading,
 }) => {
+    const { t } = useTranslation();
+
     // Get recipient types for an event
     const getEventRecipients = (eventName: string): Set<string> => {
         const event = events.find((e) => e.event_name === eventName);
@@ -67,7 +72,7 @@ export const ProjectNotificationConfig: React.FC<ProjectNotificationConfigProps>
     if (availableEvents.length === 0) {
         return (
             <Card>
-                <Empty description="No events available" />
+                <Empty description={t('notification.events.noEvents')} />
             </Card>
         );
     }
@@ -76,8 +81,8 @@ export const ProjectNotificationConfig: React.FC<ProjectNotificationConfigProps>
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
             {/* Info Alert */}
             <Alert
-                message="Email Notification Settings"
-                description="Chọn các recipients sẽ nhận email khi event xảy ra. Tích/bỏ tích checkbox để thêm/xóa recipients."
+                message={t('notification.emailSettings')}
+                description={t('notification.selectRecipients')}
                 type="info"
                 showIcon
                 icon={<BellOutlined />}
@@ -108,13 +113,13 @@ export const ProjectNotificationConfig: React.FC<ProjectNotificationConfigProps>
                                     <>
                                         <CheckCircleOutlined style={{ color: '#52c41a' }} />
                                         <Text type="secondary" style={{ fontSize: 12 }}>
-                                            {eventRecipients.size} recipient(s) configured
+                                            {t('notification.events.configured', { count: eventRecipients.size })}
                                         </Text>
                                     </>
                                 )}
                                 {!hasRecipients && (
                                     <Text type="secondary" style={{ fontSize: 12 }}>
-                                        No recipients (notifications disabled)
+                                        {t('notification.events.noRecipients')}
                                     </Text>
                                 )}
                             </Space>
@@ -161,17 +166,17 @@ export const ProjectNotificationConfig: React.FC<ProjectNotificationConfigProps>
             <Card size="small" style={{ background: '#f0f5ff', border: '1px solid #adc6ff' }}>
                 <Space direction="vertical" size="small" style={{ width: '100%' }}>
                     <Text strong>
-                        <BellOutlined /> Summary
+                        <BellOutlined /> {t('notification.summary.title')}
                     </Text>
                     <Space split={<span style={{ color: '#d9d9d9' }}>•</span>}>
                         <Text type="secondary">
-                            Total Events: <strong>{availableEvents.length}</strong>
+                            {t('notification.summary.totalEvents')}: <strong>{availableEvents.length}</strong>
                         </Text>
                         <Text type="secondary">
-                            Configured: <strong>{events.length}</strong>
+                            {t('notification.summary.configured')}: <strong>{events.length}</strong>
                         </Text>
                         <Text type="secondary">
-                            Active Recipients:{' '}
+                            {t('notification.summary.activeRecipients')}:{' '}
                             <strong>{events.reduce((sum, e) => sum + e.recipients.length, 0)}</strong>
                         </Text>
                     </Space>

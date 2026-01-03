@@ -1,0 +1,94 @@
+{
+    "team": {
+      "title": "Team Management",
+      "addMember": "Add Member",
+      "addMemberToProject": "Add Members to Project",
+      "removeMember": "Remove Member",
+      "changeRole": "Change Role",
+      "refresh": "Refresh",
+      "loading": "Loading team data...",
+      "noMembers": "No team members",
+      
+      "statistics": {
+        "totalMembers": "Total Members",
+        "membersByRole": "Members by Role"
+      },
+      
+      "table": {
+        "member": "Member",
+        "username": "Username",
+        "department": "Department",
+        "position": "Position",
+        "role": "Role",
+        "assignedBy": "Assigned By",
+        "joinedDate": "Joined Date",
+        "actions": "Actions",
+        "assignedOn": "Assigned on {{date}}"
+      },
+      
+      "search": {
+        "placeholder": "Search members...",
+        "filterByRole": "Filter by role",
+        "showing": "Showing: {{filtered}} / {{total}} members"
+      },
+      
+      "bulkActions": {
+        "title": "Actions with {{count}} member(s)",
+        "changeRole": "Change role",
+        "removeSelected": "Remove selected",
+        "selectMembers": "Please select members"
+      },
+      
+      "addModal": {
+        "single": "Add 1 Person",
+        "multiple": "Add Multiple",
+        "employee": "Employee",
+        "employeePlaceholder": "Select employee",
+        "employeeRequired": "Please select employee",
+        "role": "Role",
+        "rolePlaceholder": "Select role",
+        "roleRequired": "Please select role",
+        "selectRoleForAll": "Select Role for All:",
+        "selectEmployees": "Select Employees ({{count}} selected):",
+        "selected": "Selected",
+        "noEmployees": "No more employees to add",
+        "addCount": "Add {{count}} person(s)",
+        "default": "Default"
+      },
+      
+      "confirm": {
+        "removeTitle": "Remove this member?",
+        "removeDescription": "Member will be removed from the project",
+        "remove": "Remove",
+        "cancel": "Cancel"
+      },
+      
+      "messages": {
+        "loadFailed": "Cannot load team data",
+        "addSuccess": "Member added successfully",
+        "addMultipleSuccess": "Added {{success}}/{{total}} members",
+        "addFailed": "Cannot add member",
+        "addNoneFailed": "Cannot add any members",
+        "removeSuccess": "Member removed successfully",
+        "removeMultipleSuccess": "Removed {{success}}/{{total}} members",
+        "removeFailed": "Cannot remove member",
+        "changeRoleSuccess": "Role changed successfully",
+        "changeRoleMultipleSuccess": "Changed role for {{success}}/{{total}} members",
+        "changeRoleFailed": "Cannot change role",
+        "memberExists": "This member is already in the project",
+        "selectAtLeastOne": "Please select at least one member",
+        "selectRole": "Please select role",
+        "loadDataFailed": "Cannot load data"
+      },
+      
+      "pagination": {
+        "total": "Total {{count}} members"
+      },
+      
+      "buttons": {
+        "add": "Add",
+        "cancel": "Cancel",
+        "close": "Close"
+      }
+    }
+  }

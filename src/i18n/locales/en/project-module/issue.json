@@ -1,0 +1,300 @@
+{
+    "issue": {
+      "title": "Issues",
+      "createIssue": "Create Issue",
+      "editIssue": "Edit Issue",
+      "deleteIssue": "Delete Issue",
+      "viewIssue": "View Issue",
+      "loading": "Loading issues...",
+      "noIssues": "No issues",
+      
+      "form": {
+        "summary": "Summary",
+        "summaryPlaceholder": "Enter issue summary",
+        "summaryRequired": "Please input the summary!",
+        "summaryMax": "Summary cannot exceed 255 characters",
+        "type": "Type",
+        "typePlaceholder": "Select issue type",
+        "typeRequired": "Please select the type!",
+        "status": "Status",
+        "statusPlaceholder": "Select status",
+        "statusRequired": "Please select the status!",
+        "priority": "Priority",
+        "priorityPlaceholder": "Select priority",
+        "assignee": "Assignee",
+        "assigneePlaceholder": "Select assignee",
+        "reporter": "Reporter",
+        "reporterPlaceholder": "Select reporter",
+        "reporterRequired": "Please select reporter",
+        "epic": "Epic",
+        "epicPlaceholder": "Select epic (optional)",
+        "sprint": "Sprint",
+        "sprintPlaceholder": "Select sprint",
+        "storyPoints": "Story Points",
+        "storyPointsPlaceholder": "Enter SP",
+        "description": "Description",
+        "descriptionPlaceholder": "Enter detailed description",
+        "dueDate": "Due Date",
+        "estimatedTime": "Estimated Time",
+        "estimatedTimePlaceholder": "Hours",
+        "estimatedTimeLabel": "Estimate (hours)",
+        "timeSpent": "Time Spent",
+        "resolution": "Resolution",
+        "resolutionPlaceholder": "Enter resolution (if any)"
+      },
+      
+      "assignees": {
+        "title": "Assignees",
+        "addAssignee": "Add assignee...",
+        "removeAssignee": "Remove assignee",
+        "noAssignees": "No assignees yet",
+        "alreadyAssigned": "This employee has already been assigned",
+        "addSuccess": "Assignee added",
+        "removeSuccess": "Assignee removed",
+        "addFailed": "Cannot add assignee",
+        "removeFailed": "Cannot remove assignee",
+        "loadFailed": "Cannot load assignees",
+        "loadEmployeesFailed": "Cannot load employees"
+      },
+      
+      "comments": {
+        "title": "Comments",
+        "addComment": "Send comment",
+        "writeComment": "Write comment...",
+        "noComments": "No comments yet",
+        "edit": "Edit",
+        "delete": "Delete",
+        "deleteConfirm": "Delete this comment?",
+        "save": "Save",
+        "cancel": "Cancel",
+        "contentRequired": "Please enter comment content",
+        "createSuccess": "Comment added",
+        "updateSuccess": "Comment updated",
+        "deleteSuccess": "Comment deleted",
+        "createFailed": "Cannot add comment",
+        "updateFailed": "Cannot update comment",
+        "deleteFailed": "Cannot delete comment",
+        "loadFailed": "Cannot load comments",
+        "timeAgo": "{{time}} ago"
+      },
+      
+      "editModal": {
+        "title": "Edit Issue",
+        "titleWithCode": "Edit Issue: {{code}}",
+        "close": "Close",
+        "deleteIssue": "Delete Issue",
+        "deleteConfirmTitle": "Confirm Delete Issue",
+        "deleteWarning": "Warning: This action cannot be undone!",
+        "deleteConfirmMessage": "Are you sure you want to delete this issue?",
+        "deleteConfirm": "Confirm Delete",
+        "deleteCancel": "Cancel",
+        "issue": "Issue",
+        "summaryLabel": "Summary",
+        "deletedDataWarning": "The following data will be permanently deleted:",
+        "deletedDataList": {
+          "assignees": "All assignees of the issue",
+          "watchers": "All watchers of the issue",
+          "comments": "All comments of the issue",
+          "links": "All links related to the issue",
+          "history": "Change history of the issue",
+          "sprint": "Link with Sprint (if any)"
+        },
+        "deleteSuccess": "Issue {{code}} has been deleted successfully"
+      },
+      
+      "tabs": {
+        "assignees": "Assignees",
+        "watchers": "Watchers",
+        "links": "Links",
+        "comments": "Comments",
+        "history": "History"
+      },
+      
+      "filter": {
+        "search": "Search issues...",
+        "assignee": "Assignee",
+        "issueType": "Issue Type",
+        "epic": "Epic",
+        "clearAll": "Clear filters",
+        "filtering": "Filtering",
+        "issueCount": "{{count}} issues",
+        "filteredCount": "{{filtered}} / {{total}} issues",
+        "clearAllTooltip": "Clear all filters"
+      },
+      
+      "board": {
+        "title": "Board",
+        "loadingData": "Loading board data...",
+        "error": "Error: {{error}}",
+        "noData": "No data available",
+        "column": "Column",
+        "moveIssue": "Move issue",
+        "noIssuesInColumn": "No issues in this column",
+        "dragAndDrop": "Drag and drop to move issues",
+        "refresh": "Refresh",
+        "createIssue": "Create Issue"
+      },
+      
+      "messages": {
+        "createSuccess": "Issue created successfully!",
+        "updateSuccess": "Issue updated successfully!",
+        "deleteSuccess": "Issue deleted successfully",
+        "moveSuccess": "Card moved successfully",
+        "createFailed": "Cannot create issue",
+        "updateFailed": "Cannot update issue",
+        "deleteFailed": "Cannot delete issue",
+        "moveFailed": "Cannot move issue",
+        "syncFailed": "Cannot sync with server",
+        "loadTypeFailed": "Cannot load issue types",
+        "loadStatusFailed": "Cannot load statuses",
+        "loadFailed": "Cannot load issues",
+        "loadInfoFailed": "Cannot load issue information",
+        "loadRefDataFailed": "Cannot load reference data",
+        "reloadAfterCreate": "Page will reload to show the new issue",
+        "saveChanges": "Save changes"
+      },
+      
+      "actions": {
+        "create": "Create",
+        "update": "Update",
+        "delete": "Delete",
+        "cancel": "Cancel",
+        "close": "Close",
+        "save": "Save"
+      },
+      
+      "details": {
+        "issueCode": "Issue Code",
+        "summary": "Summary",
+        "description": "Description",
+        "type": "Type",
+        "issueType": "Issue Type",
+        "status": "Status",
+        "priority": "Priority",
+        "assignees": "Assignees",
+        "reporter": "Reporter",
+        "epic": "Epic",
+        "sprint": "Sprint",
+        "storyPoints": "Story Points",
+        "createdAt": "Created At",
+        "updatedAt": "Updated At",
+        "dueDate": "Due Date",
+        "project": "Project"
+      },
+      
+      "history": {
+      "title": "Change History",
+      "noHistory": "No change history yet",
+      "loadFailed": "Cannot load change history",
+      "from": "From:",
+      "to": "To:",
+      "empty": "(empty)",
+      "fieldLabels": {
+        "issue_created": "Issue created",
+        "issue_deleted": "Issue deleted",
+        "issue_type_id": "Issue type",
+        "current_status_id": "Status",
+        "epic_link_id": "Epic",
+        "reporter_id": "Reporter",
+        "summary": "Summary",
+        "description": "Description",
+        "story_points": "Story points",
+        "original_estimate_seconds": "Original estimate",
+        "time_spent_seconds": "Time spent",
+        "resolution": "Resolution",
+        "assignee_added": "Assignee added",
+        "assignee_removed": "Assignee removed",
+        "watcher_added": "Watcher added",
+        "watcher_removed": "Watcher removed",
+        "link_created": "Link created",
+        "link_deleted": "Link deleted"
+      }
+    },
+    
+    "links": {
+      "title": "Links",
+      "addNewLink": "Add new link",
+      "addLink": "Add link",
+      "removeLink": "Remove link",
+      "noLinks": "No links yet",
+      "linkFrom": "Links from this issue",
+      "linkTo": "Links to this issue",
+      "searchPlaceholder": "Search issue by code or summary...",
+      "selectIssue": "Please select an issue to link",
+      "linkExists": "This link already exists",
+      "addSuccess": "Link added",
+      "removeSuccess": "Link removed",
+      "addFailed": "Cannot add link",
+      "removeFailed": "Cannot remove link",
+      "loadFailed": "Cannot load links",
+      "searchFailed": "Cannot search issues",
+      "linkTypes": {
+        "relates_to": "Relates to",
+        "blocks": "Blocks",
+        "is_blocked_by": "Is blocked by",
+        "duplicates": "Duplicates",
+        "is_duplicated_by": "Is duplicated by",
+        "causes": "Causes",
+        "is_caused_by": "Is caused by",
+        "parent_of": "Parent of",
+        "child_of": "Child of",
+        "blocked_by": "Blocked by",
+        "duplicated_by": "Duplicated by",
+        "caused_by": "Caused by"
+      }
+    },
+    
+    "watchers": {
+      "title": "Watchers",
+      "addWatcher": "Add watcher...",
+      "removeWatcher": "Remove watcher",
+      "noWatchers": "No one is watching this issue yet",
+      "watching": "Watching",
+      "watch": "Watch",
+      "watchTooltip": "Watch this issue",
+      "unwatchTooltip": "Stop watching",
+      "you": "You",
+      "alreadyWatching": "This person is already watching the issue",
+      "cannotIdentify": "Cannot identify current user",
+      "addSuccess": "Watcher added",
+      "removeSuccess": "Watcher removed",
+      "watchSuccess": "Started watching issue",
+      "unwatchSuccess": "Stopped watching issue",
+      "addFailed": "Cannot add watcher",
+      "removeFailed": "Cannot remove watcher",
+      "toggleFailed": "Cannot change watch status",
+      "loadFailed": "Cannot load watchers",
+      "loadEmployeesFailed": "Cannot load employees"
+    }
+  },
+
+  "workflowStatus": {
+    "createStatus": "Create Status",
+    "addStatus": "Add Column",
+    "form": {
+      "statusName": "Status Name",
+      "statusNamePlaceholder": "Enter status name (e.g., In Review)",
+      "statusNameRequired": "Please enter status name",
+      "statusNameMax": "Status name must not exceed 100 characters",
+      "statusCategory": "Status Category",
+      "statusCategoryPlaceholder": "Select status category",
+      "statusCategoryRequired": "Please select status category",
+      "isInitialStatus": "Set as Initial Status",
+      "isInitialStatusTooltip": "Issues will start with this status when created"
+    },
+    "messages": {
+      "createSuccess": "Status created successfully",
+      "createFailed": "Failed to create status",
+      "updateSuccess": "Status updated successfully",
+      "updateFailed": "Failed to update status",
+      "deleteSuccess": "Status deleted successfully",
+      "deleteFailed": "Failed to delete status"
+    }
+  },
+  "common": {
+    "create": "Create",
+    "cancel": "Cancel",
+    "update": "Update",
+    "delete": "Delete"
+  }
+}

@@ -1,0 +1,98 @@
+{
+    "role": {
+      "title": "Project Roles & Permissions",
+      "createRole": "Create Role",
+      "editRole": "Edit Role",
+      "deleteRole": "Delete Role",
+      "managePermissions": "Manage Permissions",
+      "clearPermissions": "Clear All Permissions",
+      "loading": "Loading roles...",
+      "noRoles": "No roles found",
+      
+      "statistics": {
+        "totalRoles": "Total Roles",
+        "customRoles": "Custom Roles",
+        "totalMembers": "Total Members"
+      },
+      
+      "form": {
+        "roleName": "Role Name",
+        "roleNamePlaceholder": "e.g., Developer, QA Tester, Designer",
+        "roleNameRequired": "Please enter role name",
+        "roleNameMin": "Role name must be at least 2 characters",
+        "roleNameMax": "Role name must not exceed 50 characters",
+        "description": "Description",
+        "descriptionPlaceholder": "Describe the responsibilities of this role",
+        "descriptionMax": "Description must not exceed 200 characters",
+        "cannotRenameDefault": "⚠️ Cannot rename default roles"
+      },
+      
+      "table": {
+        "roleName": "Role Name",
+        "description": "Description",
+        "members": "Members",
+        "actions": "Actions",
+        "defaultRole": "Default"
+      },
+      
+      "permissions": {
+        "title": "Manage Permissions for \"{{roleName}}\"",
+        "instantManagement": "Instant Permission Management",
+        "checkToAssign": "✓ Check to assign a permission (instant)",
+        "uncheckToRemove": "✗ Uncheck to remove a permission (instant)",
+        "changesApplied": "All changes are applied immediately.",
+        "assigned": "Assigned",
+        "processing": "Processing",
+        "assignedCount": "Assigned: {{count}}",
+        "processingCount": "Processing: {{count}}",
+        "processingTag": "Processing...",
+        "noPermissions": "No permissions available"
+      },
+      
+      "actions": {
+        "manage": "Manage",
+        "edit": "Edit Role",
+        "clearAll": "Clear All Permissions",
+        "delete": "Delete Role",
+        "cannotDeleteDefault": "Cannot delete default roles"
+      },
+      
+      "messages": {
+        "loadFailed": "Failed to load roles",
+        "loadDetailFailed": "Failed to load role details",
+        "createSuccess": "Role created successfully",
+        "updateSuccess": "Role updated successfully",
+        "deleteSuccess": "Role \"{{roleName}}\" deleted successfully",
+        "deleteFailed": "Failed to delete role",
+        "permissionAssigned": "Permission assigned successfully",
+        "permissionRemoved": "Permission removed successfully",
+        "permissionFailed": "Failed to {{action}} permission",
+        "clearAllSuccess": "All permissions cleared successfully",
+        "clearAllFailed": "Failed to clear permissions",
+        "genericError": "An error occurred"
+      },
+      
+      "confirm": {
+        "deleteTitle": "Delete role \"{{roleName}}\"?",
+        "deleteDescription": "This action cannot be undone.",
+        "deleteWithMembers": "This role has {{count}} members. Please reassign them first.",
+        "clearAllTitle": "Clear All Permissions for \"{{roleName}}\"?",
+        "clearAllDescription": "This will remove all permissions from this role. Members with this role will lose their current permissions.",
+        "clearAll": "Clear All",
+        "delete": "Delete",
+        "cancel": "Cancel"
+      },
+      
+      "info": {
+        "rbacTitle": "Role-Based Access Control",
+        "rbacDescription": "Manage roles and their permissions for this project. Default roles (Administrator, Member, Viewer) cannot be deleted but can have their permissions customized."
+      },
+      
+      "buttons": {
+        "create": "Create",
+        "update": "Update",
+        "cancel": "Cancel",
+        "close": "Close"
+      }
+    }
+  }

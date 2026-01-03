@@ -1,0 +1,112 @@
+{
+    "project": {
+      "title": "Dự án",
+      "allProjects": "Tất cả dự án",
+      "createProject": "Tạo dự án mới",
+      "editProject": "Chỉnh sửa dự án",
+      "deleteProject": "Xóa dự án",
+      "projectDetails": "Chi tiết dự án",
+      "noProjects": "Không có dự án",
+      "loading": "Đang tải dự án...",
+      "loadingData": "Đang tải dữ liệu...",
+      
+      "form": {
+        "projectKey": "Mã dự án",
+        "projectKeyPlaceholder": "VD: PROJ",
+        "projectKeyRequired": "Vui lòng nhập mã dự án",
+        "projectKeyMin": "Mã dự án phải có ít nhất 2 ký tự",
+        "projectKeyMax": "Mã dự án không được quá 10 ký tự",
+        "projectKeyPattern": "Mã dự án chỉ được chứa chữ cái in hoa và số",
+        "projectKeyTooltip": "Mã ngắn gọn để định danh dự án (VD: PROJ, ERP, WEB)",
+        "projectName": "Tên dự án",
+        "projectNamePlaceholder": "VD: Hệ thống quản lý ERP",
+        "projectNameRequired": "Vui lòng nhập tên dự án",
+        "projectNameMax": "Tên dự án không được quá 255 ký tự",
+        "description": "Mô tả dự án",
+        "descriptionPlaceholder": "Mô tả ngắn về dự án...",
+        "lead": "Trưởng dự án",
+        "leadRequired": "Vui lòng chọn trưởng dự án",
+        "leadTooltip": "Người chịu trách nhiệm chính cho dự án",
+        "leadPlaceholder": "Chọn trưởng dự án",
+        "permissionScheme": "Permission Scheme",
+        "permissionSchemeRequired": "Vui lòng chọn permission scheme",
+        "permissionSchemeTooltip": "Định nghĩa quyền hạn và vai trò trong dự án",
+        "permissionSchemePlaceholder": "Chọn permission scheme",
+        "notificationScheme": "Notification Scheme",
+        "notificationSchemeRequired": "Vui lòng chọn notification scheme",
+        "notificationSchemeTooltip": "Cấu hình email thông báo cho các sự kiện",
+        "notificationSchemePlaceholder": "Chọn notification scheme",
+        "workflowScheme": "Workflow Scheme",
+        "workflowSchemeRequired": "Vui lòng chọn workflow scheme",
+        "workflowSchemeTooltip": "Định nghĩa quy trình làm việc cho các loại issue",
+        "workflowSchemePlaceholder": "Chọn workflow scheme"
+      },
+      
+      "table": {
+        "projectKey": "Mã dự án",
+        "projectName": "Tên dự án",
+        "description": "Mô tả",
+        "noDescription": "Không có mô tả",
+        "lead": "Trưởng dự án",
+        "action": "Thao tác",
+        "open": "Mở"
+      },
+      
+      "search": {
+        "placeholder": "Tìm kiếm theo mã, tên, mô tả hoặc trưởng dự án...",
+        "found": "Tìm thấy {{count}} dự án",
+        "noResults": "Không tìm thấy dự án cho \"{{query}}\"",
+        "totalProjects": "{{count}} tổng"
+      },
+      
+      "schemes": {
+        "title": "Cấu hình Schemes",
+        "description": "Các schemes sẽ được sao chép riêng cho dự án này",
+        "default": "MẶC ĐỊNH"
+      },
+      
+      "info": {
+        "note": "Lưu ý",
+        "createNote": "Khi tạo dự án, hệ thống sẽ tự động sao chép các schemes đã chọn. Bạn sẽ được gán quyền Admin trong dự án và có thể chỉnh sửa schemes mà không ảnh hưởng đến các dự án khác.",
+        "successMessage": "Dự án {{projectKey}} đã được tạo thành công!",
+        "roleAssigned": "Bạn đã được gán quyền {{role}}"
+      },
+      
+      "messages": {
+        "loadFailed": "Không thể tải dự án",
+        "loadDataFailed": "Không thể tải dữ liệu. Vui lòng thử lại.",
+        "createSuccess": "Đã tạo dự án",
+        "updateSuccess": "Đã cập nhật dự án",
+        "deleteFailed": "Không thể xóa dự án",
+        "keyExists": "Mã dự án đã tồn tại. Vui lòng chọn mã khác.",
+        "genericError": "Không thể tạo dự án. Vui lòng thử lại."
+      },
+      
+      "buttons": {
+        "create": "Tạo dự án",
+        "update": "Cập nhật",
+        "cancel": "Hủy",
+        "close": "Đóng"
+      },
+      
+      "pagination": {
+        "total": "Tổng {{count}} dự án"
+      }
+    },
+    
+    "projectHeader": {
+      "project": "Dự án",
+      "lead": "Trưởng dự án",
+      "viewDetails": "Xem chi tiết dự án",
+      
+      "tabs": {
+        "summary": "Tổng quan",
+        "sprintBacklog": "Backlog",
+        "board": "Bảng",
+        "epics": "Epic",
+        "team": "Nhóm",
+        "roles": "Vai trò & Quyền",
+        "notifications": "Thông báo"
+      }
+    }
+  }

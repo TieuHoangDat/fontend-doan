@@ -1,0 +1,99 @@
+{
+    "role": {
+      "title": "Vai trò & Quyền hạn Dự án",
+      "createRole": "Tạo vai trò",
+      "editRole": "Chỉnh sửa vai trò",
+      "deleteRole": "Xóa vai trò",
+      "managePermissions": "Quản lý quyền",
+      "clearPermissions": "Xóa tất cả quyền",
+      "loading": "Đang tải vai trò...",
+      "noRoles": "Không tìm thấy vai trò",
+      
+      "statistics": {
+        "totalRoles": "Tổng vai trò",
+        "customRoles": "Vai trò tùy chỉnh",
+        "totalMembers": "Tổng thành viên"
+      },
+      
+      "form": {
+        "roleName": "Tên vai trò",
+        "roleNamePlaceholder": "Ví dụ: Developer, QA Tester, Designer",
+        "roleNameRequired": "Vui lòng nhập tên vai trò",
+        "roleNameMin": "Tên vai trò phải có ít nhất 2 ký tự",
+        "roleNameMax": "Tên vai trò không được quá 50 ký tự",
+        "description": "Mô tả",
+        "descriptionPlaceholder": "Mô tả trách nhiệm của vai trò này",
+        "descriptionMax": "Mô tả không được quá 200 ký tự",
+        "cannotRenameDefault": "⚠️ Không thể đổi tên vai trò mặc định"
+      },
+      
+      "table": {
+        "roleName": "Tên vai trò",
+        "description": "Mô tả",
+        "members": "Thành viên",
+        "actions": "Thao tác",
+        "defaultRole": "Mặc định"
+      },
+      
+      "permissions": {
+        "title": "Quản lý quyền cho \"{{roleName}}\"",
+        "instantManagement": "Quản lý quyền tức thì",
+        "checkToAssign": "✓ Tích để gán quyền (tức thì)",
+        "uncheckToRemove": "✗ Bỏ tích để xóa quyền (tức thì)",
+        "changesApplied": "Tất cả thay đổi được áp dụng ngay lập tức.",
+        "assigned": "Đã gán",
+        "processing": "Đang xử lý",
+        "assignedCount": "Đã gán: {{count}}",
+        "processingCount": "Đang xử lý: {{count}}",
+        "assignedTag": "Đã gán",
+        "processingTag": "Đang xử lý...",
+        "noPermissions": "Không có quyền"
+      },
+      
+      "actions": {
+        "manage": "Quản lý",
+        "edit": "Chỉnh sửa vai trò",
+        "clearAll": "Xóa tất cả quyền",
+        "delete": "Xóa vai trò",
+        "cannotDeleteDefault": "Không thể xóa vai trò mặc định"
+      },
+      
+      "messages": {
+        "loadFailed": "Không thể tải vai trò",
+        "loadDetailFailed": "Không thể tải chi tiết vai trò",
+        "createSuccess": "Đã tạo vai trò",
+        "updateSuccess": "Đã cập nhật vai trò",
+        "deleteSuccess": "Đã xóa vai trò \"{{roleName}}\"",
+        "deleteFailed": "Không thể xóa vai trò",
+        "permissionAssigned": "Đã gán quyền",
+        "permissionRemoved": "Đã xóa quyền",
+        "permissionFailed": "Không thể {{action}} quyền",
+        "clearAllSuccess": "Đã xóa tất cả quyền",
+        "clearAllFailed": "Không thể xóa quyền",
+        "genericError": "Đã xảy ra lỗi"
+      },
+      
+      "confirm": {
+        "deleteTitle": "Xóa vai trò \"{{roleName}}\"?",
+        "deleteDescription": "Hành động này không thể hoàn tác.",
+        "deleteWithMembers": "Vai trò này có {{count}} thành viên. Vui lòng chỉ định lại trước.",
+        "clearAllTitle": "Xóa tất cả quyền cho \"{{roleName}}\"?",
+        "clearAllDescription": "Điều này sẽ xóa tất cả quyền khỏi vai trò này. Thành viên có vai trò này sẽ mất quyền hiện tại.",
+        "clearAll": "Xóa tất cả",
+        "delete": "Xóa",
+        "cancel": "Hủy"
+      },
+      
+      "info": {
+        "rbacTitle": "Kiểm soát truy cập dựa trên vai trò",
+        "rbacDescription": "Quản lý vai trò và quyền của họ cho dự án này. Vai trò mặc định (Administrator, Member, Viewer) không thể xóa nhưng có thể tùy chỉnh quyền."
+      },
+      
+      "buttons": {
+        "create": "Tạo",
+        "update": "Cập nhật",
+        "cancel": "Hủy",
+        "close": "Đóng"
+      }
+    }
+  }

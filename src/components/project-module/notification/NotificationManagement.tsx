@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import {
     Card,
@@ -15,6 +17,7 @@ import {
     ReloadOutlined,
     InfoCircleOutlined,
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { ProjectNotificationConfig } from './ProjectNotificationConfig';
 import {
     notificationManagementService,
@@ -30,6 +33,7 @@ type NotificationManagementProps = {
 };
 
 export const NotificationManagement: React.FC<NotificationManagementProps> = ({ projectId }) => {
+    const { t } = useTranslation();
     const [project, setProject] = useState<Project | null>(null);
     const [scheme, setScheme] = useState<NotificationScheme | null>(null);
     const [events, setEvents] = useState<EventGroup[]>([]);
@@ -60,11 +64,11 @@ export const NotificationManagement: React.FC<NotificationManagementProps> = ({ 
                 setAvailableEvents(allEvents);
                 setAvailableRecipients(recipients);
             } else {
-                message.warning('Project chưa có notification scheme');
+                message.warning(t('notification.messages.noSchemeWarning'));
             }
         } catch (error) {
             console.error('Error fetching data:', error);
-            message.error('Không thể tải cấu hình notification');
+            message.error(t('notification.messages.loadError'));
         } finally {
             setLoading(false);
         }
@@ -89,26 +93,32 @@ export const NotificationManagement: React.FC<NotificationManagementProps> = ({ 
                     event_name: eventName,
                     recipient_types: [recipientType],
                 });
-                message.success(`Đã thêm ${recipientType} vào ${eventName}`);
+                message.success(t('notification.messages.addSuccess', {
+                    recipient: recipientType,
+                    event: eventName
+                }));
             } else {
                 await notificationManagementService.bulkRemoveRecipients({
                     notification_scheme_id: scheme.id,
                     event_name: eventName,
                     recipient_types: [recipientType],
                 });
-                message.success(`Đã xóa ${recipientType} khỏi ${eventName}`);
+                message.success(t('notification.messages.removeSuccess', {
+                    recipient: recipientType,
+                    event: eventName
+                }));
             }
             fetchData();
         } catch (error) {
             console.error('Error toggling recipient:', error);
-            message.error('Không thể cập nhật recipient');
+            message.error(t('notification.messages.updateError'));
         }
     };
 
     if (!project) {
         return (
             <div style={{ padding: '24px' }}>
-                <Spin />
+                <Spin tip={t('notification.loading')} />
             </div>
         );
     }
@@ -119,12 +129,12 @@ export const NotificationManagement: React.FC<NotificationManagementProps> = ({ 
                 <Card>
                     <Space direction="vertical" align="center" style={{ width: '100%', padding: '40px 0' }}>
                         <InfoCircleOutlined style={{ fontSize: 48, color: '#d9d9d9' }} />
-                        <Title level={4}>No Notification Scheme</Title>
+                        <Title level={4}>{t('notification.scheme.noScheme')}</Title>
                         <Text type="secondary">
-                            Project này chưa được gán notification scheme.
+                            {t('notification.scheme.noSchemeDescription')}
                         </Text>
                         <Text type="secondary">
-                            Vui lòng liên hệ admin để cấu hình.
+                            {t('notification.scheme.contactAdmin')}
                         </Text>
                     </Space>
                 </Card>
@@ -147,10 +157,10 @@ export const NotificationManagement: React.FC<NotificationManagementProps> = ({ 
                         >
                             <Space direction="vertical" size="small">
                                 <Title level={3} style={{ margin: 0 }}>
-                                    <BellOutlined /> Notification Settings
+                                    <BellOutlined /> {t('notification.title')}
                                 </Title>
                                 <Text type="secondary">
-                                    Cấu hình email notifications cho project {project.project_name}
+                                    {t('notification.emailSettings')} {project.project_name}
                                 </Text>
                             </Space>
                             <Button
@@ -158,21 +168,21 @@ export const NotificationManagement: React.FC<NotificationManagementProps> = ({ 
                                 onClick={fetchData}
                                 loading={loading}
                             >
-                                Refresh
+                                {t('notification.refresh')}
                             </Button>
                         </div>
                     </Card>
 
                     {/* Project & Scheme Info */}
-                    <Card size="small" title="Project Information">
+                    <Card size="small" title={t('notification.projectInfo.title')}>
                         <Descriptions column={2} size="small">
-                            <Descriptions.Item label="Project Name">
+                            <Descriptions.Item label={t('notification.projectInfo.projectName')}>
                                 <Text strong>{project.project_name}</Text>
                             </Descriptions.Item>
-                            <Descriptions.Item label="Project Key">
+                            <Descriptions.Item label={t('notification.projectInfo.projectKey')}>
                                 <Tag color="blue">{project.project_key}</Tag>
                             </Descriptions.Item>
-                            <Descriptions.Item label="Notification Scheme" span={2}>
+                            <Descriptions.Item label={t('notification.projectInfo.notificationScheme')} span={2}>
                                 <Space>
                                     <Tag color="green">{scheme.scheme_name}</Tag>
                                     {scheme.scheme_description && (
@@ -182,13 +192,13 @@ export const NotificationManagement: React.FC<NotificationManagementProps> = ({ 
                                     )}
                                 </Space>
                             </Descriptions.Item>
-                            <Descriptions.Item label="Total Events" span={2}>
+                            <Descriptions.Item label={t('notification.projectInfo.totalEvents')} span={2}>
                                 <Space split={<Divider type="vertical" />}>
                                     <Text>
-                                        Configured: <Tag color="blue">{events.length}</Tag>
+                                        {t('notification.projectInfo.configured')}: <Tag color="blue">{events.length}</Tag>
                                     </Text>
                                     <Text>
-                                        Total Rules:{' '}
+                                        {t('notification.projectInfo.totalRules')}:{' '}
                                         <Tag color="cyan">
                                             {events.reduce((sum, e) => sum + e.recipients.length, 0)}
                                         </Tag>

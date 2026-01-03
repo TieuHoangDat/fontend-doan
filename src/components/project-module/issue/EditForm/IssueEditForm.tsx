@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import {
     Form,
@@ -17,6 +19,7 @@ import {
     TagOutlined,
     SaveOutlined,
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { issueService, Issue, IssueType, WorkflowStatus, Employee } from '@/lib/api/services/project-module/issue.service';
 import { epicService } from '@/lib/api/services/project-module/epic.service';
 
@@ -55,12 +58,10 @@ export type IssueDetail = {
     };
 };
 
-
 type Epic = {
     id: number;
     epic_name: string;
 };
-
 
 type IssueEditFormProps = {
     issueId: number;
@@ -73,6 +74,7 @@ export const IssueEditForm: React.FC<IssueEditFormProps> = ({
     onSuccess,
     onCancel,
 }) => {
+    const { t } = useTranslation();
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);
@@ -82,14 +84,12 @@ export const IssueEditForm: React.FC<IssueEditFormProps> = ({
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [issue, setIssue] = useState<IssueDetail | null>(null);
 
-    // Fetch issue details
     const fetchIssueDetail = async (id: number) => {
         try {
             setLoading(true);
             const issueData = await issueService.getById(id);
             setIssue(issueData);
 
-            // Set form values
             form.setFieldsValue({
                 summary: issueData.summary,
                 description: issueData.description,
@@ -105,13 +105,12 @@ export const IssueEditForm: React.FC<IssueEditFormProps> = ({
             });
         } catch (error) {
             console.error('Error fetching issue:', error);
-            message.error('Không thể tải thông tin issue');
+            message.error(t('issue.messages.loadInfoFailed'));
         } finally {
             setLoading(false);
         }
     };
 
-    // Fetch reference data
     const fetchReferenceData = async () => {
         try {
             const types = await issueService.getIssueTypes(issue?.project_id || 1);
@@ -124,22 +123,19 @@ export const IssueEditForm: React.FC<IssueEditFormProps> = ({
                 const epics = await epicService.getAll({ projectId: issue.project_id });
                 setEpics(epics);
 
-                const statuses = await issueService.getWorkflowStatuses(1, issue.project_id); // Giả sử workflowId = 1
-
+                const statuses = await issueService.getWorkflowStatuses(1, issue.project_id);
                 setStatuses(statuses);
             }
         } catch (error) {
             console.error('Error fetching reference data:', error);
-            message.error('Không thể tải dữ liệu tham chiếu');
+            message.error(t('issue.messages.loadRefDataFailed'));
         }
     };
 
-    // Handle form submission
     const handleSubmit = async (values: any) => {
         try {
             setSubmitting(true);
 
-            // Convert hours back to seconds
             const submitData = {
                 ...values,
                 original_estimate_seconds: values.original_estimate_seconds
@@ -149,11 +145,14 @@ export const IssueEditForm: React.FC<IssueEditFormProps> = ({
 
             await issueService.update(issueId, submitData);
 
-            message.success('Cập nhật issue thành công!');
+            message.success(t('issue.messages.updateSuccess'));
             onSuccess?.();
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
         } catch (error) {
-            // Error updating issue
-            message.error('Không thể cập nhật issue');
+            console.error('Error updating issue:', error);
+            message.error(t('issue.messages.updateFailed'));
         } finally {
             setSubmitting(false);
         }
@@ -173,7 +172,6 @@ export const IssueEditForm: React.FC<IssueEditFormProps> = ({
 
     return (
         <Spin spinning={loading}>
-            {/* Project info */}
             {issue?.project && (
                 <div
                     style={{
@@ -184,40 +182,37 @@ export const IssueEditForm: React.FC<IssueEditFormProps> = ({
                     }}
                 >
                     <Space>
-                        <Tag color="blue">Project: {issue.project.project_name}</Tag>
-                        <Tag color="purple">Issue: {issue.issue_code}</Tag>
+                        <Tag color="blue">{t('issue.details.project')}: {issue.project.project_name}</Tag>
+                        <Tag color="purple">{t('issue.details.issueCode')}: {issue.issue_code}</Tag>
                     </Space>
                 </div>
             )}
 
             <Form form={form} layout="vertical" onFinish={handleSubmit}>
-                {/* Summary */}
                 <Form.Item
                     name="summary"
-                    label="Tóm tắt"
+                    label={t('issue.form.summary')}
                     rules={[
-                        { required: true, message: 'Vui lòng nhập tóm tắt' },
-                        { max: 255, message: 'Tóm tắt không được vượt quá 255 ký tự' },
+                        { required: true, message: t('issue.form.summaryRequired') },
+                        { max: 255, message: t('issue.form.summaryMax') },
                     ]}
                 >
-                    <Input placeholder="Nhập tóm tắt issue" maxLength={255} />
+                    <Input placeholder={t('issue.form.summaryPlaceholder')} maxLength={255} />
                 </Form.Item>
 
-                {/* Description */}
-                <Form.Item name="description" label="Mô tả">
-                    <TextArea rows={3} placeholder="Nhập mô tả chi tiết" />
+                <Form.Item name="description" label={t('issue.form.description')}>
+                    <TextArea rows={3} placeholder={t('issue.form.descriptionPlaceholder')} />
                 </Form.Item>
 
                 <Row gutter={16}>
-                    {/* Issue Type */}
                     <Col span={12}>
                         <Form.Item
                             name="issue_type_id"
-                            label="Loại issue"
-                            rules={[{ required: true, message: 'Vui lòng chọn loại issue' }]}
+                            label={t('issue.form.type')}
+                            rules={[{ required: true, message: t('issue.form.typeRequired') }]}
                         >
                             <Select
-                                placeholder="Chọn loại"
+                                placeholder={t('issue.form.typePlaceholder')}
                                 loading={issueTypes.length === 0}
                             >
                                 {issueTypes.map((type) => (
@@ -229,15 +224,14 @@ export const IssueEditForm: React.FC<IssueEditFormProps> = ({
                         </Form.Item>
                     </Col>
 
-                    {/* Status */}
                     <Col span={12}>
                         <Form.Item
                             name="current_status_id"
-                            label="Trạng thái"
-                            rules={[{ required: true, message: 'Vui lòng chọn trạng thái' }]}
+                            label={t('issue.form.status')}
+                            rules={[{ required: true, message: t('issue.form.statusRequired') }]}
                         >
                             <Select
-                                placeholder="Chọn trạng thái"
+                                placeholder={t('issue.form.statusPlaceholder')}
                                 loading={statuses.length === 0}
                             >
                                 {statuses.map((status) => (
@@ -250,14 +244,13 @@ export const IssueEditForm: React.FC<IssueEditFormProps> = ({
                     </Col>
                 </Row>
 
-                {/* Reporter */}
                 <Form.Item
                     name="reporter_id"
-                    label="Người báo cáo"
-                    rules={[{ required: true, message: 'Vui lòng chọn người báo cáo' }]}
+                    label={t('issue.form.reporter')}
+                    rules={[{ required: true, message: t('issue.form.reporterRequired') }]}
                 >
                     <Select
-                        placeholder="Chọn người báo cáo"
+                        placeholder={t('issue.form.reporterPlaceholder')}
                         showSearch
                         optionFilterProp="children"
                         loading={employees.length === 0}
@@ -273,10 +266,9 @@ export const IssueEditForm: React.FC<IssueEditFormProps> = ({
                     </Select>
                 </Form.Item>
 
-                {/* Epic Link */}
-                <Form.Item name="epic_link_id" label="Epic">
+                <Form.Item name="epic_link_id" label={t('issue.form.epic')}>
                     <Select
-                        placeholder="Chọn epic (tùy chọn)"
+                        placeholder={t('issue.form.epicPlaceholder')}
                         allowClear
                         loading={epics.length === 0 && issue?.project_id !== undefined}
                     >
@@ -292,37 +284,36 @@ export const IssueEditForm: React.FC<IssueEditFormProps> = ({
                 </Form.Item>
 
                 <Row gutter={16}>
-                    {/* Story Points */}
                     <Col span={12}>
-                        <Form.Item name="story_points" label="Story Points">
+                        <Form.Item name="story_points" label={t('issue.form.storyPoints')}>
                             <InputNumber
                                 min={0}
                                 max={100}
-                                placeholder="Nhập SP"
+                                placeholder={t('issue.form.storyPointsPlaceholder')}
                                 style={{ width: '100%' }}
                             />
                         </Form.Item>
                     </Col>
 
-                    {/* Original Estimate */}
                     <Col span={12}>
-                        <Form.Item name="original_estimate_seconds" label="Ước lượng (giờ)">
+                        <Form.Item 
+                            name="original_estimate_seconds" 
+                            label={t('issue.form.estimatedTimeLabel')}
+                        >
                             <InputNumber
                                 min={0}
                                 step={0.5}
-                                placeholder="Số giờ"
+                                placeholder={t('issue.form.estimatedTimePlaceholder')}
                                 style={{ width: '100%' }}
                             />
                         </Form.Item>
                     </Col>
                 </Row>
 
-                {/* Resolution */}
-                <Form.Item name="resolution" label="Giải pháp">
-                    <Input placeholder="Nhập giải pháp (nếu có)" />
+                <Form.Item name="resolution" label={t('issue.form.resolution')}>
+                    <Input placeholder={t('issue.form.resolutionPlaceholder')} />
                 </Form.Item>
 
-                {/* Action Buttons */}
                 <Form.Item style={{ marginTop: 24, marginBottom: 0 }}>
                     <Space>
                         <Button
@@ -331,10 +322,10 @@ export const IssueEditForm: React.FC<IssueEditFormProps> = ({
                             icon={<SaveOutlined />}
                             loading={submitting}
                         >
-                            Lưu thay đổi
+                            {t('issue.messages.saveChanges')}
                         </Button>
                         <Button onClick={onCancel}>
-                            Hủy
+                            {t('issue.actions.cancel')}
                         </Button>
                     </Space>
                 </Form.Item>

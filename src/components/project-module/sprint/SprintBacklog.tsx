@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import {
     Card,
@@ -21,6 +23,7 @@ import {
     ReloadOutlined,
 } from '@ant-design/icons';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import { useTranslation } from 'react-i18next';
 import { SprintFormModal } from './SprintFormModal';
 import { SprintIssueCard } from './SprintIssueCard';
 import { IssueEditModal } from '../issue/EditForm/IssueEditModal';
@@ -36,6 +39,7 @@ type SprintBacklogProps = {
 };
 
 export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
+    const { t } = useTranslation();
     const [sprints, setSprints] = useState<Sprint[]>([]);
     const [backlogIssues, setBacklogIssues] = useState<Issue[]>([]);
     const [sprintIssues, setSprintIssues] = useState<Record<number, Issue[]>>({});
@@ -46,7 +50,6 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
     const [issueEditModalVisible, setIssueEditModalVisible] = useState(false);
     const [createIssueModalVisible, setCreateIssueModalVisible] = useState(false);
 
-    // Filter state
     const [filters, setFilters] = useState<SprintFilterValues>({
         search: '',
         assigneeIds: [],
@@ -54,20 +57,16 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
         epicIds: [],
     });
 
-    // Fetch sprints and issues
     const fetchData = async () => {
         try {
             setLoading(true);
             
-            // Fetch sprints
             const sprintsData = await sprintService.getAll({ projectId });
             setSprints(sprintsData);
 
-            // Fetch backlog
             const backlogData = await sprintService.getBacklog(projectId);
             setBacklogIssues(backlogData);
 
-            // Fetch issues for each sprint
             const sprintIssuesData: Record<number, Issue[]> = {};
             for (const sprint of sprintsData) {
                 const issuesData = await sprintService.getSprintIssues(sprint.id);
@@ -76,7 +75,7 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
             setSprintIssues(sprintIssuesData);
         } catch (error) {
             console.error('Error fetching data:', error);
-            message.error('Không thể tải dữ liệu');
+            message.error(t('sprint.messages.loadFailed'));
         } finally {
             setLoading(false);
         }
@@ -88,25 +87,21 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
         }
     }, [projectId]);
 
-    // Handle filter change
     const handleFilterChange = (newFilters: SprintFilterValues) => {
         setFilters(newFilters);
     };
 
-    // Apply filters
     const { filteredBacklog, filteredSprintIssues, totalIssues, filteredCount } = useFilteredSprintData(
         backlogIssues,
         sprintIssues,
         filters
     );
 
-    // Handle drag and drop
     const handleDragEnd = async (result: DropResult) => {
         const { source, destination, draggableId } = result;
 
         if (!destination) return;
 
-        // Same position
         if (
             source.droppableId === destination.droppableId &&
             source.index === destination.index
@@ -123,58 +118,53 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
             : parseInt(destination.droppableId.split('-')[1]);
 
         try {
-            // Move issue
             await sprintService.moveIssue({
                 issue_id: issueId,
                 target_sprint_id: targetSprintId,
                 rank_order: destination.index + 1,
             });
 
-            message.success('Đã di chuyển issue');
+            message.success(t('sprint.messages.moveSuccess'));
             fetchData();
         } catch (error) {
             console.error('Error moving issue:', error);
-            message.error('Không thể di chuyển issue');
+            message.error(t('sprint.messages.moveFailed'));
         }
     };
 
-    // Start sprint
     const handleStartSprint = async (sprintId: number) => {
         try {
             await sprintService.start(sprintId);
-            message.success('Đã bắt đầu sprint');
+            message.success(t('sprint.messages.startSuccess'));
             fetchData();
         } catch (error: any) {
             console.error('Error starting sprint:', error);
-            message.error(error.response?.data?.message || 'Không thể bắt đầu sprint');
+            message.error(error.response?.data?.message || t('sprint.messages.startFailed'));
         }
     };
 
-    // Complete sprint
     const handleCompleteSprint = async (sprintId: number) => {
         try {
             await sprintService.complete(sprintId);
-            message.success('Đã hoàn thành sprint');
+            message.success(t('sprint.messages.completeSuccess'));
             fetchData();
         } catch (error: any) {
             console.error('Error completing sprint:', error);
-            message.error(error.response?.data?.message || 'Không thể hoàn thành sprint');
+            message.error(error.response?.data?.message || t('sprint.messages.completeFailed'));
         }
     };
 
-    // Delete sprint
     const handleDeleteSprint = async (sprintId: number) => {
         try {
             await sprintService.delete(sprintId);
-            message.success('Đã xóa sprint');
+            message.success(t('sprint.messages.deleteSuccess'));
             fetchData();
         } catch (error: any) {
             console.error('Error deleting sprint:', error);
-            message.error(error.response?.data?.message || 'Không thể xóa sprint');
+            message.error(error.response?.data?.message || t('sprint.messages.deleteFailed'));
         }
     };
 
-    // Get sprint status color
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'active': return 'processing';
@@ -184,29 +174,33 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
         }
     };
 
-    // Handle edit issue
+    const getStatusLabel = (status: string) => {
+        const statusKey = status as 'planning' | 'active' | 'completed' | 'closed';
+        return t(`sprint.status.${statusKey}`, status);
+    };
+
     const handleEditIssue = (issueId: number) => {
         setEditingIssueId(issueId);
         setIssueEditModalVisible(true);
     };
 
-    // Handle issue edit success
     const handleIssueEditSuccess = () => {
         setIssueEditModalVisible(false);
         setEditingIssueId(null);
         fetchData();
     };
 
-    // Handle create issue success
     const handleCreateIssueSuccess = () => {
         setCreateIssueModalVisible(false);
         fetchData();
     };
 
-    // Handle refresh
     const handleRefresh = () => {
         fetchData();
     };
+
+    const hasFilter = filters.search || filters.assigneeIds.length > 0 || 
+                      filters.issueTypeIds.length > 0 || filters.epicIds.length > 0;
 
     return (
         <div style={{ padding: '24px' }}>
@@ -215,7 +209,7 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
                     {/* Header */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Title level={3} style={{ margin: 0 }}>
-                            <RocketOutlined /> Sprint Backlog
+                            <RocketOutlined /> {t('sprint.title')}
                         </Title>
                         <Space>
                             <Button
@@ -223,14 +217,14 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
                                 onClick={handleRefresh}
                                 loading={loading}
                             >
-                                Làm mới
+                                {t('sprint.refresh')}
                             </Button>
                             <Button
                                 type="default"
                                 icon={<PlusOutlined />}
                                 onClick={() => setCreateIssueModalVisible(true)}
                             >
-                                Create Issue
+                                {t('sprint.createIssue')}
                             </Button>
                             <Button
                                 type="primary"
@@ -240,7 +234,7 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
                                     setFormModalVisible(true);
                                 }}
                             >
-                                Create Sprint
+                                {t('sprint.createSprint')}
                             </Button>
                         </Space>
                     </div>
@@ -258,11 +252,11 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
                         <Card
                             title={
                                 <Space>
-                                    <Text strong>Backlog</Text>
-                                    <Tag>{filteredBacklog.length}</Tag>
-                                    {filters.search || filters.assigneeIds.length > 0 || filters.issueTypeIds.length > 0 || filters.epicIds.length > 0 ? (
-                                        <Tag color="orange">/ {backlogIssues.length} tổng</Tag>
-                                    ) : null}
+                                    <Text strong>{t('sprint.backlog')}</Text>
+                                    <Tag>{t('sprint.issue.issueCount', { count: filteredBacklog.length })}</Tag>
+                                    {hasFilter && backlogIssues.length !== filteredBacklog.length && (
+                                        <Tag color="orange">{t('sprint.filter.totalLabel', { count: backlogIssues.length })}</Tag>
+                                    )}
                                 </Space>
                             }
                             style={{ marginBottom: 16 }}
@@ -283,8 +277,8 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
                                             <Empty 
                                                 description={
                                                     backlogIssues.length === 0 
-                                                        ? "No issues in backlog" 
-                                                        : "Không có issue nào phù hợp với bộ lọc"
+                                                        ? t('sprint.issue.noIssuesInBacklog')
+                                                        : t('sprint.issue.noMatchingIssues')
                                                 } 
                                             />
                                         ) : (
@@ -320,7 +314,6 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
                         {sprints.map((sprint) => {
                             const sprintFilteredIssues = filteredSprintIssues[sprint.id] || [];
                             const sprintTotalIssues = sprintIssues[sprint.id]?.length || 0;
-                            const hasFilter = filters.search || filters.assigneeIds.length > 0 || filters.issueTypeIds.length > 0 || filters.epicIds.length > 0;
 
                             return (
                                 <Card
@@ -330,11 +323,11 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
                                             <Space>
                                                 <Text strong>{sprint.sprint_name}</Text>
                                                 <Tag color={getStatusColor(sprint.status)}>
-                                                    {sprint.status}
+                                                    {getStatusLabel(sprint.status)}
                                                 </Tag>
-                                                <Tag>{sprintFilteredIssues.length} issues</Tag>
+                                                <Tag>{t('sprint.issue.issueCount', { count: sprintFilteredIssues.length })}</Tag>
                                                 {hasFilter && sprintTotalIssues !== sprintFilteredIssues.length && (
-                                                    <Tag color="orange">/ {sprintTotalIssues} tổng</Tag>
+                                                    <Tag color="orange">{t('sprint.filter.totalLabel', { count: sprintTotalIssues })}</Tag>
                                                 )}
                                             </Space>
                                             <Space>
@@ -345,7 +338,7 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
                                                         icon={<RocketOutlined />}
                                                         onClick={() => handleStartSprint(sprint.id)}
                                                     >
-                                                        Start Sprint
+                                                        {t('sprint.startSprint')}
                                                     </Button>
                                                 )}
                                                 {sprint.status === 'active' && (
@@ -355,7 +348,7 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
                                                         icon={<CheckCircleOutlined />}
                                                         onClick={() => handleCompleteSprint(sprint.id)}
                                                     >
-                                                        Complete
+                                                        {t('sprint.completeSprint')}
                                                     </Button>
                                                 )}
                                                 <Dropdown
@@ -369,7 +362,7 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
                                                                     setFormModalVisible(true);
                                                                 }}
                                                             >
-                                                                Edit
+                                                                {t('sprint.actions.edit')}
                                                             </Menu.Item>
                                                             <Menu.Item
                                                                 key="delete"
@@ -377,7 +370,7 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
                                                                 icon={<DeleteOutlined />}
                                                                 onClick={() => handleDeleteSprint(sprint.id)}
                                                             >
-                                                                Delete
+                                                                {t('sprint.actions.delete')}
                                                             </Menu.Item>
                                                         </Menu>
                                                     }
@@ -391,7 +384,7 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
                                 >
                                     {sprint.goal && (
                                         <Text type="secondary" style={{ display: 'block', marginBottom: 12 }}>
-                                            Goal: {sprint.goal}
+                                            {t('sprint.goal')}: {sprint.goal}
                                         </Text>
                                     )}
                                     <Droppable droppableId={`sprint-${sprint.id}`}>
@@ -410,8 +403,8 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
                                                     <Empty 
                                                         description={
                                                             sprintTotalIssues === 0 
-                                                                ? "No issues in this sprint" 
-                                                                : "Không có issue nào phù hợp với bộ lọc"
+                                                                ? t('sprint.issue.noIssuesInSprint')
+                                                                : t('sprint.issue.noMatchingIssues')
                                                         } 
                                                     />
                                                 ) : (
@@ -448,7 +441,6 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
                 </Space>
             </Spin>
 
-            {/* Sprint Form Modal */}
             <SprintFormModal
                 visible={formModalVisible}
                 sprint={editingSprint}
@@ -464,7 +456,6 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
                 }}
             />
 
-            {/* Issue Edit Modal */}
             <IssueEditModal
                 visible={issueEditModalVisible}
                 issueId={editingIssueId}
@@ -475,7 +466,6 @@ export const SprintBacklog: React.FC<SprintBacklogProps> = ({ projectId }) => {
                 onSuccess={handleIssueEditSuccess}
             />
 
-            {/* Create Issue Modal */}
             <CreateIssueModal
                 visible={createIssueModalVisible}
                 projectId={projectId}

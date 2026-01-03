@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import {
     Table,
@@ -26,6 +28,7 @@ import {
     SafetyOutlined,
     ExclamationCircleOutlined,
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { ProjectRole } from '@/lib/api/services/project-module/project-role.service';
 import { projectRoleService, RoleDetail } from '@/lib/api/services/project-module/project-role.service';
 import { RoleModal } from './RoleModal';
@@ -39,6 +42,7 @@ interface RoleManagementProps {
 }
 
 export const RoleManagement: React.FC<RoleManagementProps> = ({ projectId }) => {
+    const { t } = useTranslation();
     const [roles, setRoles] = useState<ProjectRole[]>([]);
     const [loading, setLoading] = useState(false);
     const [isRoleModalVisible, setIsRoleModalVisible] = useState(false);
@@ -59,7 +63,7 @@ export const RoleManagement: React.FC<RoleManagementProps> = ({ projectId }) => 
             const data = await projectRoleService.getRoles(projectId);
             setRoles(data);
         } catch (error: any) {
-            message.error('Failed to load roles');
+            message.error(t('role.messages.loadFailed'));
         } finally {
             setLoading(false);
         }
@@ -88,10 +92,10 @@ export const RoleManagement: React.FC<RoleManagementProps> = ({ projectId }) => 
     const handleDeleteRole = async (role: ProjectRole) => {
         try {
             await projectRoleService.deleteRole(projectId, role.id);
-            message.success(`Role "${role.role_name}" deleted successfully`);
+            message.success(t('role.messages.deleteSuccess', { roleName: role.role_name }));
             await loadRoles();
         } catch (error: any) {
-            message.error(error.response?.data?.message || 'Failed to delete role');
+            message.error(error.response?.data?.message || t('role.messages.deleteFailed'));
         }
     };
 
@@ -102,7 +106,7 @@ export const RoleManagement: React.FC<RoleManagementProps> = ({ projectId }) => 
             setSelectedRoleForPermission(roleDetail);
             setIsPermissionModalVisible(true);
         } catch (error: any) {
-            message.error('Failed to load role details');
+            message.error(t('role.messages.loadDetailFailed'));
         } finally {
             setLoading(false);
         }
@@ -124,7 +128,6 @@ export const RoleManagement: React.FC<RoleManagementProps> = ({ projectId }) => 
         await loadRoles();
     };
 
-    // ✅ NEW: Handler for removing permission
     const handleRemovePermission = async (actionKey: string) => {
         if (!selectedRoleForPermission) return;
 
@@ -144,24 +147,23 @@ export const RoleManagement: React.FC<RoleManagementProps> = ({ projectId }) => 
 
     const handleClearPermissions = (role: ProjectRole) => {
         Modal.confirm({
-            title: `Clear All Permissions for "${role.role_name}"?`,
+            title: t('role.confirm.clearAllTitle', { roleName: role.role_name }),
             icon: <ExclamationCircleOutlined />,
-            content:
-                'This will remove all permissions from this role. Members with this role will lose their current permissions.',
-            okText: 'Clear All',
+            content: t('role.confirm.clearAllDescription'),
+            okText: t('role.confirm.clearAll'),
             okType: 'danger',
+            cancelText: t('role.confirm.cancel'),
             async onOk() {
                 try {
                     await projectRoleService.clearAllPermissions(projectId, role.id);
-                    message.success('All permissions cleared successfully');
+                    message.success(t('role.messages.clearAllSuccess'));
                     await loadRoles();
                 } catch (error: any) {
-                    message.error(error.response?.data?.message || 'Failed to clear permissions');
+                    message.error(error.response?.data?.message || t('role.messages.clearAllFailed'));
                 }
             },
         });
     };
-
 
     const isDefaultRole = (roleName: string) => {
         return ['Administrator', 'Member', 'Viewer'].includes(roleName);
@@ -169,25 +171,25 @@ export const RoleManagement: React.FC<RoleManagementProps> = ({ projectId }) => 
 
     const columns = [
         {
-            title: 'Role Name',
+            title: t('role.table.roleName'),
             dataIndex: 'role_name',
             key: 'role_name',
             render: (name: string) => (
                 <Space>
                     <SafetyOutlined />
                     <strong>{name}</strong>
-                    {isDefaultRole(name) && <Tag color="gold">Default</Tag>}
+                    {isDefaultRole(name) && <Tag color="gold">{t('role.table.defaultRole')}</Tag>}
                 </Space>
             ),
         },
         {
-            title: 'Description',
+            title: t('role.table.description'),
             dataIndex: 'role_description',
             key: 'role_description',
             ellipsis: true,
         },
         {
-            title: 'Members',
+            title: t('role.table.members'),
             dataIndex: 'member_count',
             key: 'member_count',
             width: 120,
@@ -200,24 +202,23 @@ export const RoleManagement: React.FC<RoleManagementProps> = ({ projectId }) => 
             ),
         },
         {
-            title: 'Actions',
+            title: t('role.table.actions'),
             key: 'actions',
             width: 220,
             render: (_: any, role: ProjectRole) => (
                 <Space size="small">
-
-                    <Tooltip title="Manage Permissions">
+                    <Tooltip title={t('role.managePermissions')}>
                         <Button
                             size="small"
                             type="primary"
                             icon={<KeyOutlined />}
                             onClick={() => handleManagePermissions(role)}
                         >
-                            Manage
+                            {t('role.actions.manage')}
                         </Button>
                     </Tooltip>
 
-                    <Tooltip title="Edit Role">
+                    <Tooltip title={t('role.actions.edit')}>
                         <Button
                             size="small"
                             icon={<EditOutlined />}
@@ -227,29 +228,29 @@ export const RoleManagement: React.FC<RoleManagementProps> = ({ projectId }) => 
 
                     {!isDefaultRole(role.role_name) && (
                         <>
-                            <Tooltip title="Clear All Permissions">
+                            <Tooltip title={t('role.actions.clearAll')}>
                                 <Popconfirm
-                                    title="Clear all permissions?"
+                                    title={t('role.clearPermissions')}
                                     onConfirm={() => handleClearPermissions(role)}
-                                    okText="Clear"
-                                    cancelText="Cancel"
+                                    okText={t('role.confirm.clearAll')}
+                                    cancelText={t('role.confirm.cancel')}
                                 >
                                     <Button size="small" danger icon={<ClearOutlined />} />
                                 </Popconfirm>
                             </Tooltip>
 
-                            <Tooltip title="Delete Role">
+                            <Tooltip title={t('role.actions.delete')}>
                                 <Popconfirm
-                                    title={`Delete role "${role.role_name}"?`}
+                                    title={t('role.confirm.deleteTitle', { roleName: role.role_name })}
                                     description={
                                         role.member_count > 0
-                                            ? `This role has ${role.member_count} members. Please reassign them first.`
-                                            : 'This action cannot be undone.'
+                                            ? t('role.confirm.deleteWithMembers', { count: role.member_count })
+                                            : t('role.confirm.deleteDescription')
                                     }
                                     onConfirm={() => handleDeleteRole(role)}
-                                    okText="Delete"
+                                    okText={t('role.confirm.delete')}
                                     okType="danger"
-                                    cancelText="Cancel"
+                                    cancelText={t('role.confirm.cancel')}
                                     disabled={role.member_count > 0}
                                 >
                                     <Button
@@ -264,7 +265,7 @@ export const RoleManagement: React.FC<RoleManagementProps> = ({ projectId }) => 
                     )}
 
                     {isDefaultRole(role.role_name) && (
-                        <Tooltip title="Cannot delete default roles">
+                        <Tooltip title={t('role.actions.cannotDeleteDefault')}>
                             <Button size="small" danger icon={<DeleteOutlined />} disabled />
                         </Tooltip>
                     )}
@@ -283,7 +284,7 @@ export const RoleManagement: React.FC<RoleManagementProps> = ({ projectId }) => 
                 <Col span={8}>
                     <Card>
                         <Statistic
-                            title="Total Roles"
+                            title={t('role.statistics.totalRoles')}
                             value={roles.length}
                             prefix={<SafetyOutlined />}
                         />
@@ -292,7 +293,7 @@ export const RoleManagement: React.FC<RoleManagementProps> = ({ projectId }) => 
                 <Col span={8}>
                     <Card>
                         <Statistic
-                            title="Custom Roles"
+                            title={t('role.statistics.customRoles')}
                             value={customRolesCount}
                             prefix={<SafetyOutlined />}
                             valueStyle={{ color: '#1890ff' }}
@@ -302,7 +303,7 @@ export const RoleManagement: React.FC<RoleManagementProps> = ({ projectId }) => 
                 <Col span={8}>
                     <Card>
                         <Statistic
-                            title="Total Members"
+                            title={t('role.statistics.totalMembers')}
                             value={totalMembers}
                             prefix={<TeamOutlined />}
                             valueStyle={{ color: '#52c41a' }}
@@ -316,18 +317,18 @@ export const RoleManagement: React.FC<RoleManagementProps> = ({ projectId }) => 
                 title={
                     <Space>
                         <SafetyOutlined />
-                        <span>Project Roles & Permissions</span>
+                        <span>{t('role.title')}</span>
                     </Space>
                 }
                 extra={
                     <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateRole}>
-                        Create Role
+                        {t('role.createRole')}
                     </Button>
                 }
             >
                 <Alert
-                    message="Role-Based Access Control"
-                    description="Manage roles and their permissions for this project. Default roles (Administrator, Member, Viewer) cannot be deleted but can have their permissions customized."
+                    message={t('role.info.rbacTitle')}
+                    description={t('role.info.rbacDescription')}
                     type="info"
                     showIcon
                     style={{ marginBottom: 16 }}
@@ -367,7 +368,7 @@ export const RoleManagement: React.FC<RoleManagementProps> = ({ projectId }) => 
                     roleName={selectedRoleForPermission.role_name}
                     existingPermissions={selectedRoleForPermission.permissions}
                     onSubmit={handleAssignPermissions}
-                    onRemove={handleRemovePermission} // ✅ Pass remove handler
+                    onRemove={handleRemovePermission}
                 />
             )}
         </div>

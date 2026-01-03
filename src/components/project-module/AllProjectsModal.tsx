@@ -1,4 +1,3 @@
-// src/components/project-module/AllProjectsModal.tsx
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -6,6 +5,7 @@ import { Modal, Input, Button, Table, Tag, Empty, Space } from 'antd';
 import { SearchOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import FolderKanban from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import type { ColumnsType } from 'antd/es/table';
 import { Project } from '@/lib/api/services/project-module/project.service';
 
@@ -23,6 +23,7 @@ export const AllProjectsModal: React.FC<AllProjectsModalProps> = ({
   loading = false,
 }) => {
   const router = useRouter();
+  const { t } = useTranslation();
   const [searchText, setSearchText] = useState('');
 
   // Filter projects based on search
@@ -46,7 +47,7 @@ export const AllProjectsModal: React.FC<AllProjectsModalProps> = ({
 
   const columns: ColumnsType<Project> = [
     {
-      title: 'Project Key',
+      title: t('project.table.projectKey'),
       dataIndex: 'project_key',
       key: 'project_key',
       width: 120,
@@ -61,25 +62,25 @@ export const AllProjectsModal: React.FC<AllProjectsModalProps> = ({
       ),
     },
     {
-      title: 'Project Name',
+      title: t('project.table.projectName'),
       dataIndex: 'project_name',
       key: 'project_name',
       ellipsis: true,
       render: (text) => <span className="font-medium">{text}</span>,
     },
     {
-      title: 'Description',
+      title: t('project.table.description'),
       dataIndex: 'project_description',
       key: 'project_description',
       ellipsis: true,
       render: (text) => (
         <span className="text-gray-500 text-sm">
-          {text || <span className="text-gray-300">No description</span>}
+          {text || <span className="text-gray-300">{t('project.table.noDescription')}</span>}
         </span>
       ),
     },
     {
-      title: 'Lead',
+      title: t('project.table.lead'),
       dataIndex: ['lead_employee', 'full_name'],
       key: 'lead',
       width: 150,
@@ -88,7 +89,7 @@ export const AllProjectsModal: React.FC<AllProjectsModalProps> = ({
       ),
     },
     {
-      title: 'Action',
+      title: t('project.table.action'),
       key: 'action',
       width: 100,
       align: 'center',
@@ -99,7 +100,7 @@ export const AllProjectsModal: React.FC<AllProjectsModalProps> = ({
           icon={<ArrowRightOutlined />}
           onClick={() => handleNavigateToProject(record.id)}
         >
-          Open
+          {t('project.table.open')}
         </Button>
       ),
     },
@@ -110,8 +111,8 @@ export const AllProjectsModal: React.FC<AllProjectsModalProps> = ({
       title={
         <div className="flex items-center gap-2">
           <FolderKanban className="w-5 h-5 text-blue-600" />
-          <span className="text-lg font-semibold">All Projects</span>
-          <Tag color="blue">{projects.length} total</Tag>
+          <span className="text-lg font-semibold">{t('project.allProjects')}</span>
+          <Tag color="blue">{t('project.search.totalProjects', { count: projects.length })}</Tag>
         </div>
       }
       open={open}
@@ -123,7 +124,7 @@ export const AllProjectsModal: React.FC<AllProjectsModalProps> = ({
       {/* Search Bar */}
       <div className="p-4 border-b border-gray-200 bg-gray-50">
         <Input
-          placeholder="Search by project key, name, description, or lead..."
+          placeholder={t('project.search.placeholder')}
           prefix={<SearchOutlined className="text-gray-400" />}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
@@ -132,7 +133,7 @@ export const AllProjectsModal: React.FC<AllProjectsModalProps> = ({
         />
         {searchText && (
           <div className="mt-2 text-sm text-gray-500">
-            Found {filteredProjects.length} project{filteredProjects.length !== 1 ? 's' : ''}
+            {t('project.search.found', { count: filteredProjects.length })}
           </div>
         )}
       </div>
@@ -147,7 +148,7 @@ export const AllProjectsModal: React.FC<AllProjectsModalProps> = ({
           pagination={{
             pageSize: 10,
             showSizeChanger: false,
-            showTotal: (total) => `Total ${total} projects`,
+            showTotal: (total) => t('project.pagination.total', { count: total }),
           }}
           locale={{
             emptyText: (
@@ -156,10 +157,10 @@ export const AllProjectsModal: React.FC<AllProjectsModalProps> = ({
                 description={
                   searchText ? (
                     <span>
-                      No projects found for "<strong>{searchText}</strong>"
+                      {t('project.search.noResults', { query: searchText })}
                     </span>
                   ) : (
-                    'No projects available'
+                    t('project.noProjects')
                   )
                 }
               />

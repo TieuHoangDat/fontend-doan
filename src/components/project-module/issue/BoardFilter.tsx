@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import {
     Card,
@@ -19,6 +21,7 @@ import {
     AppstoreOutlined,
     FlagOutlined,
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { issueService, Employee, IssueType } from '@/lib/api/services/project-module/issue.service';
 
 const { Option } = Select;
@@ -43,6 +46,7 @@ export const BoardFilter: React.FC<BoardFilterProps> = ({
     totalIssues = 0,
     filteredCount,
 }) => {
+    const { t } = useTranslation();
     const [search, setSearch] = useState('');
     const [assigneeIds, setAssigneeIds] = useState<number[]>([]);
     const [issueTypeIds, setIssueTypeIds] = useState<number[]>([]);
@@ -53,7 +57,6 @@ export const BoardFilter: React.FC<BoardFilterProps> = ({
     const [epics, setEpics] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
 
-    // Fetch filter options
     useEffect(() => {
         const fetchFilterOptions = async () => {
             try {
@@ -76,7 +79,6 @@ export const BoardFilter: React.FC<BoardFilterProps> = ({
         fetchFilterOptions();
     }, [projectId]);
 
-    // Trigger filter change
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             onFilterChange({
@@ -85,12 +87,11 @@ export const BoardFilter: React.FC<BoardFilterProps> = ({
                 issueTypeIds,
                 epicIds,
             });
-        }, 300); // Debounce 300ms
+        }, 300);
 
         return () => clearTimeout(timeoutId);
     }, [search, assigneeIds, issueTypeIds, epicIds]);
 
-    // Clear all filters
     const handleClearFilters = () => {
         setSearch('');
         setAssigneeIds([]);
@@ -98,7 +99,6 @@ export const BoardFilter: React.FC<BoardFilterProps> = ({
         setEpicIds([]);
     };
 
-    // Check if any filter is active
     const hasActiveFilters = search || assigneeIds.length > 0 || issueTypeIds.length > 0 || epicIds.length > 0;
     const activeFilterCount = [
         search ? 1 : 0,
@@ -114,9 +114,8 @@ export const BoardFilter: React.FC<BoardFilterProps> = ({
             bodyStyle={{ padding: '12px 16px' }}
         >
             <Space wrap size="middle" style={{ width: '100%' }}>
-                {/* Search Input */}
                 <Input
-                    placeholder="Tìm kiếm issue..."
+                    placeholder={t('issue.filter.search')}
                     prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -126,13 +125,12 @@ export const BoardFilter: React.FC<BoardFilterProps> = ({
 
                 <Divider type="vertical" style={{ height: 32 }} />
 
-                {/* Assignee Filter */}
                 <Select
                     mode="multiple"
                     placeholder={
                         <Space>
                             <UserOutlined />
-                            <span>Assignee</span>
+                            <span>{t('issue.filter.assignee')}</span>
                         </Space>
                     }
                     value={assigneeIds}
@@ -157,13 +155,12 @@ export const BoardFilter: React.FC<BoardFilterProps> = ({
                     ))}
                 </Select>
 
-                {/* Issue Type Filter */}
                 <Select
                     mode="multiple"
                     placeholder={
                         <Space>
                             <AppstoreOutlined />
-                            <span>Loại issue</span>
+                            <span>{t('issue.filter.issueType')}</span>
                         </Space>
                     }
                     value={issueTypeIds}
@@ -181,14 +178,13 @@ export const BoardFilter: React.FC<BoardFilterProps> = ({
                     ))}
                 </Select>
 
-                {/* Epic Filter */}
                 {epics.length > 0 && (
                     <Select
                         mode="multiple"
                         placeholder={
                             <Space>
                                 <FlagOutlined />
-                                <span>Epic</span>
+                                <span>{t('issue.filter.epic')}</span>
                             </Space>
                         }
                         value={epicIds}
@@ -209,36 +205,35 @@ export const BoardFilter: React.FC<BoardFilterProps> = ({
 
                 <Divider type="vertical" style={{ height: 32 }} />
 
-                {/* Clear Filters Button */}
                 {hasActiveFilters && (
-                    <Tooltip title="Xóa tất cả bộ lọc">
+                    <Tooltip title={t('issue.filter.clearAllTooltip')}>
                         <Button
                             icon={<ClearOutlined />}
                             onClick={handleClearFilters}
                             type="text"
                             danger
                         >
-                            Xóa lọc
+                            {t('issue.filter.clearAll')}
                         </Button>
                     </Tooltip>
                 )}
 
-                {/* Filter Status */}
                 <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
                     {hasActiveFilters && (
                         <Badge count={activeFilterCount} size="small">
                             <Tag icon={<FilterOutlined />} color="blue">
-                                Đang lọc
+                                {t('issue.filter.filtering')}
                             </Tag>
                         </Badge>
                     )}
                     <Tag color={hasActiveFilters ? 'orange' : 'default'}>
                         {filteredCount !== undefined ? (
-                            <>
-                                {filteredCount} / {totalIssues} issues
-                            </>
+                            t('issue.filter.filteredCount', {
+                                filtered: filteredCount,
+                                total: totalIssues
+                            })
                         ) : (
-                            <>{totalIssues} issues</>
+                            t('issue.filter.issueCount', { count: totalIssues })
                         )}
                     </Tag>
                 </div>
@@ -247,9 +242,6 @@ export const BoardFilter: React.FC<BoardFilterProps> = ({
     );
 };
 
-/**
- * Hook để filter board data dựa trên filter values
- */
 export const useFilteredBoardData = (
     boardData: any,
     filters: BoardFilterValues
@@ -267,10 +259,8 @@ export const useFilteredBoardData = (
         const originalItems = column.items || [];
         totalIssues += originalItems.length;
 
-        // Apply filters
         let filteredItems = [...originalItems];
 
-        // Search filter - tìm theo issueId (issue_code), summary, hoặc tên assignee
         if (filters.search) {
             const searchLower = filters.search.toLowerCase();
             filteredItems = filteredItems.filter(
@@ -278,38 +268,29 @@ export const useFilteredBoardData = (
                     item.issueId?.toLowerCase().includes(searchLower) ||
                     item.summary?.toLowerCase().includes(searchLower) ||
                     item.name?.toLowerCase().includes(searchLower) ||
-                    // Tìm trong danh sách assignees
                     (item.assignees && item.assignees.some((a: any) => 
                         a.full_name?.toLowerCase().includes(searchLower)
                     ))
             );
         }
 
-        // Assignee filter - sử dụng trường assignees (mảng) từ API
         if (filters.assigneeIds.length > 0) {
             filteredItems = filteredItems.filter((item: any) => {
-                // Sử dụng trường assignees mới từ API
                 if (item.assignees && Array.isArray(item.assignees) && item.assignees.length > 0) {
                     return item.assignees.some((a: any) => filters.assigneeIds.includes(a.id));
                 }
-                // Nếu không có assignee và đang filter theo assignee, ẩn item
                 return false;
             });
         }
 
-        // Issue Type filter - sử dụng trường issue_type_id từ API
         if (filters.issueTypeIds.length > 0) {
             filteredItems = filteredItems.filter((item: any) => {
-                // Sử dụng trường issue_type_id mới từ API
                 return filters.issueTypeIds.includes(item.issue_type_id);
             });
         }
 
-        // Epic filter - sử dụng trường epic_link_id từ API
         if (filters.epicIds.length > 0) {
             filteredItems = filteredItems.filter((item: any) => {
-                // Sử dụng trường epic_link_id mới từ API
-                // Chú ý: epic_link_id có thể là null
                 return item.epic_link_id && filters.epicIds.includes(item.epic_link_id);
             });
         }

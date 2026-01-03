@@ -1,0 +1,59 @@
+{
+    "notification": {
+      "title": "Notification Settings",
+      "loading": "Loading notification configuration...",
+      "refresh": "Refresh",
+      "emailSettings": "Email Notification Settings",
+      "selectRecipients": "Select recipients who will receive emails when events occur. Check/uncheck boxes to add/remove recipients.",
+      
+      "projectInfo": {
+        "title": "Project Information",
+        "projectName": "Project Name",
+        "projectKey": "Project Key",
+        "notificationScheme": "Notification Scheme",
+        "totalEvents": "Total Events",
+        "configured": "Configured",
+        "totalRules": "Total Rules"
+      },
+      
+      "scheme": {
+        "noScheme": "No Notification Scheme",
+        "noSchemeDescription": "This project has not been assigned a notification scheme.",
+        "contactAdmin": "Please contact the administrator for configuration."
+      },
+      
+      "events": {
+        "noEvents": "No events available",
+        "configured": "{{count}} recipient(s) configured",
+        "noRecipients": "No recipients (notifications disabled)",
+        "total": "Total Events",
+        "activeRecipients": "Active Recipients"
+      },
+      
+      "summary": {
+        "title": "Summary",
+        "totalEvents": "Total Events",
+        "configured": "Configured",
+        "activeRecipients": "Active Recipients"
+      },
+      
+      "eventTypes": {
+        "created": "Created",
+        "updated": "Updated",
+        "assigned": "Assigned",
+        "commented": "Commented",
+        "statusChanged": "Status Changed",
+        "resolved": "Resolved",
+        "closed": "Closed",
+        "workLogged": "Work Logged"
+      },
+      
+      "messages": {
+        "loadError": "Failed to load notification configuration",
+        "addSuccess": "Added {{recipient}} to {{event}}",
+        "removeSuccess": "Removed {{recipient}} from {{event}}",
+        "updateError": "Failed to update recipient",
+        "noSchemeWarning": "Project has no notification scheme"
+      }
+    }
+  }

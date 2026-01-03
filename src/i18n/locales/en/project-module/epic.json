@@ -1,0 +1,92 @@
+{
+    "epic": {
+      "title": "Epic Management",
+      "createEpic": "Create Epic",
+      "editEpic": "Edit Epic",
+      "deleteEpic": "Delete Epic",
+      "viewDetails": "View Details",
+      "epicDetails": "Epic Details",
+      "noEpics": "No epics found",
+      "loading": "Loading epics...",
+      "noData": "No data",
+      
+      "form": {
+        "epicName": "Epic Name",
+        "epicNamePlaceholder": "Enter epic name",
+        "epicNameRequired": "Please enter epic name",
+        "epicNameMax": "Epic name cannot exceed 255 characters",
+        "goal": "Goal",
+        "goalPlaceholder": "Enter epic goal or description",
+        "status": "Status",
+        "statusPlaceholder": "Select status",
+        "project": "Project",
+        "projectPlaceholder": "Select project",
+        "projectRequired": "Please select a project",
+        "startDate": "Start Date",
+        "dueDate": "Due Date",
+        "dueDateError": "Due date must be after start date"
+      },
+      
+      "status": {
+        "planning": "Planning",
+        "inProgress": "In Progress",
+        "onHold": "On Hold",
+        "done": "Done",
+        "cancelled": "Cancelled",
+        "noStatus": "No Status"
+      },
+      
+      "table": {
+        "epicName": "Epic Name",
+        "project": "Project",
+        "goal": "Goal",
+        "status": "Status",
+        "issues": "Issues",
+        "startDate": "Start Date",
+        "dueDate": "Due Date",
+        "actions": "Actions"
+      },
+      
+      "details": {
+        "epicInfo": "Epic Information",
+        "status": "Status",
+        "startDate": "Start Date",
+        "dueDate": "Due Date",
+        "goal": "Goal",
+        "noGoal": "No goal specified",
+        "issuesSection": "Issues",
+        "issuesCount": "Issues ({{count}})",
+        "noIssues": "No issues linked to this epic",
+        "issueCode": "Issue Code",
+        "summary": "Summary",
+        "type": "Type",
+        "issueStatus": "Status",
+        "assignees": "Assignees",
+        "unassigned": "Unassigned"
+      },
+      
+      "filters": {
+        "searchPlaceholder": "Search epic name or goal...",
+        "filterByProject": "Filter by project",
+        "total": "Total: {{count}} epic(s)"
+      },
+      
+      "messages": {
+        "createSuccess": "Epic created successfully",
+        "updateSuccess": "Epic updated successfully",
+        "deleteSuccess": "Epic deleted successfully",
+        "loadError": "Failed to load epic details",
+        "deleteError": "Cannot delete epic with issues",
+        "deleteConfirm": "Delete this epic?",
+        "deleteDescription": "You can only delete epics without issues."
+      },
+      
+      "buttons": {
+        "create": "Create",
+        "update": "Update",
+        "cancel": "Cancel",
+        "close": "Close",
+        "edit": "Edit Epic"
+      }
+    }
+  }

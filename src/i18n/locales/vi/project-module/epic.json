@@ -1,0 +1,92 @@
+{
+    "epic": {
+      "title": "Quản lý Epic",
+      "createEpic": "Tạo Epic",
+      "editEpic": "Chỉnh sửa Epic",
+      "deleteEpic": "Xóa Epic",
+      "viewDetails": "Xem chi tiết",
+      "epicDetails": "Chi tiết Epic",
+      "noEpics": "Không tìm thấy epic",
+      "loading": "Đang tải epic...",
+      "noData": "Không có dữ liệu",
+      
+      "form": {
+        "epicName": "Tên Epic",
+        "epicNamePlaceholder": "Nhập tên epic",
+        "epicNameRequired": "Vui lòng nhập tên epic",
+        "epicNameMax": "Tên epic không được quá 255 ký tự",
+        "goal": "Mục tiêu",
+        "goalPlaceholder": "Nhập mục tiêu hoặc mô tả epic",
+        "status": "Trạng thái",
+        "statusPlaceholder": "Chọn trạng thái",
+        "project": "Dự án",
+        "projectPlaceholder": "Chọn dự án",
+        "projectRequired": "Vui lòng chọn dự án",
+        "startDate": "Ngày bắt đầu",
+        "dueDate": "Ngày đến hạn",
+        "dueDateError": "Ngày đến hạn phải sau ngày bắt đầu"
+      },
+      
+      "status": {
+        "planning": "Đang lên kế hoạch",
+        "inProgress": "Đang thực hiện",
+        "onHold": "Tạm dừng",
+        "done": "Hoàn thành",
+        "cancelled": "Đã hủy",
+        "noStatus": "Chưa có trạng thái"
+      },
+      
+      "table": {
+        "epicName": "Tên Epic",
+        "project": "Dự án",
+        "goal": "Mục tiêu",
+        "status": "Trạng thái",
+        "issues": "Issues",
+        "startDate": "Ngày bắt đầu",
+        "dueDate": "Ngày đến hạn",
+        "actions": "Thao tác"
+      },
+      
+      "details": {
+        "epicInfo": "Thông tin Epic",
+        "status": "Trạng thái",
+        "startDate": "Ngày bắt đầu",
+        "dueDate": "Ngày đến hạn",
+        "goal": "Mục tiêu",
+        "noGoal": "Chưa có mục tiêu",
+        "issuesSection": "Issues",
+        "issuesCount": "Issues ({{count}})",
+        "noIssues": "Chưa có issue nào liên kết với epic này",
+        "issueCode": "Mã Issue",
+        "summary": "Tóm tắt",
+        "type": "Loại",
+        "issueStatus": "Trạng thái",
+        "assignees": "Người thực hiện",
+        "unassigned": "Chưa gán"
+      },
+      
+      "filters": {
+        "searchPlaceholder": "Tìm kiếm tên epic hoặc mục tiêu...",
+        "filterByProject": "Lọc theo dự án",
+        "total": "Tổng: {{count}} epic"
+      },
+      
+      "messages": {
+        "createSuccess": "Đã tạo epic",
+        "updateSuccess": "Đã cập nhật epic",
+        "deleteSuccess": "Đã xóa epic",
+        "loadError": "Không thể tải chi tiết epic",
+        "deleteError": "Không thể xóa epic có issues",
+        "deleteConfirm": "Xóa epic này?",
+        "deleteDescription": "Bạn chỉ có thể xóa epic không có issues."
+      },
+      
+      "buttons": {
+        "create": "Tạo",
+        "update": "Cập nhật",
+        "cancel": "Hủy",
+        "close": "Đóng",
+        "edit": "Chỉnh sửa Epic"
+      }
+    }
+  }

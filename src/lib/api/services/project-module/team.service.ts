@@ -152,7 +152,7 @@ export const teamService = {
    * Lấy danh sách roles có sẵn
    */
   getAvailableRoles: async (projectId: number): Promise<ProjectRole[]> => {
-    const response = await api.get<ProjectRole[]>(`/projects/${projectId}/team/roles/available`);
+    const response = await api.get<ProjectRole[]>(`/projects/${projectId}/roles`);
     return response.data;
   },
 

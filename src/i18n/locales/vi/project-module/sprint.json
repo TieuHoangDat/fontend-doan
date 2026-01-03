@@ -1,0 +1,92 @@
+{
+    "sprint": {
+      "title": "Sprint Backlog",
+      "backlog": "Backlog",
+      "createSprint": "Tạo Sprint",
+      "editSprint": "Chỉnh sửa Sprint",
+      "createIssue": "Tạo Issue",
+      "startSprint": "Bắt đầu Sprint",
+      "completeSprint": "Hoàn thành",
+      "deleteSprint": "Xóa Sprint",
+      "refresh": "Làm mới",
+      "loading": "Đang tải dữ liệu sprint...",
+      "noSprints": "Không có sprint",
+      "goal": "Mục tiêu",
+      
+      "status": {
+        "planning": "Đang lên kế hoạch",
+        "active": "Đang hoạt động",
+        "completed": "Đã hoàn thành",
+        "closed": "Đã đóng"
+      },
+      
+      "form": {
+        "title": "Tạo Sprint mới",
+        "editTitle": "Chỉnh sửa Sprint",
+        "sprintName": "Tên Sprint",
+        "sprintNamePlaceholder": "VD: Sprint 1, Alpha Release",
+        "sprintNameRequired": "Vui lòng nhập tên sprint",
+        "sprintNameMax": "Tên sprint không được quá 255 ký tự",
+        "sprintGoal": "Mục tiêu Sprint",
+        "sprintGoalPlaceholder": "Bạn muốn đạt được gì trong sprint này?",
+        "duration": "Thời gian Sprint",
+        "durationDays": "Thời lượng (Ngày)",
+        "durationDaysPlaceholder": "VD: 14",
+        "durationHelp": "Tự động tính từ ngày hoặc nhập thủ công",
+        "status": "Trạng thái",
+        "statusPlaceholder": "Chọn trạng thái"
+      },
+      
+      "filter": {
+        "search": "Tìm kiếm issue...",
+        "assignee": "Người thực hiện",
+        "issueType": "Loại issue",
+        "epic": "Epic",
+        "clearAll": "Xóa lọc",
+        "filtering": "Đang lọc",
+        "issueCount": "{{count}} issues",
+        "filteredCount": "{{filtered}} / {{total}} issues",
+        "clearAllTooltip": "Xóa tất cả bộ lọc",
+        "totalLabel": "/ {{count}} tổng"
+      },
+      
+      "issue": {
+        "noIssuesInBacklog": "Không có issue trong backlog",
+        "noIssuesInSprint": "Không có issue trong sprint này",
+        "noMatchingIssues": "Không có issue nào phù hợp với bộ lọc",
+        "issueCount": "{{count}} issues",
+        "storyPoints": "{{points}} SP",
+        "editIssue": "Chỉnh sửa issue"
+      },
+      
+      "messages": {
+        "loadFailed": "Không thể tải dữ liệu",
+        "createSuccess": "Đã tạo sprint mới",
+        "updateSuccess": "Đã cập nhật sprint",
+        "deleteSuccess": "Đã xóa sprint",
+        "startSuccess": "Đã bắt đầu sprint",
+        "completeSuccess": "Đã hoàn thành sprint",
+        "moveSuccess": "Đã di chuyển issue",
+        "saveFailed": "Không thể lưu sprint",
+        "startFailed": "Không thể bắt đầu sprint",
+        "completeFailed": "Không thể hoàn thành sprint",
+        "deleteFailed": "Không thể xóa sprint",
+        "moveFailed": "Không thể di chuyển issue",
+        "invalidData": "Dữ liệu không hợp lệ"
+      },
+      
+      "actions": {
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa",
+        "start": "Bắt đầu Sprint",
+        "complete": "Hoàn thành Sprint"
+      },
+      
+      "buttons": {
+        "create": "Tạo",
+        "update": "Cập nhật",
+        "cancel": "Hủy",
+        "close": "Đóng"
+      }
+    }
+  }

@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import {
     Modal,
@@ -22,6 +24,7 @@ import {
     DeleteOutlined,
     ExclamationCircleOutlined,
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { IssueEditForm } from './IssueEditForm';
 import { IssueAssignees } from './IssueAssignees';
 import { IssueWatchers } from './IssueWatchers';
@@ -37,7 +40,7 @@ type IssueEditModalProps = {
     visible: boolean;
     onClose: () => void;
     onSuccess?: () => void;
-    onDelete?: () => void; // Callback sau khi xóa thành công
+    onDelete?: () => void;
     currentEmployeeId?: number;
 };
 
@@ -49,6 +52,7 @@ export const IssueEditModal: React.FC<IssueEditModalProps> = ({
     onDelete,
     currentEmployeeId = 1,
 }) => {
+    const { t } = useTranslation();
     const [issueCode, setIssueCode] = useState<string>('');
     const [issueSummary, setIssueSummary] = useState<string>('');
     const [deleting, setDeleting] = useState(false);
@@ -59,7 +63,6 @@ export const IssueEditModal: React.FC<IssueEditModalProps> = ({
         onClose();
     };
 
-    // Fetch issue info for delete confirmation
     const fetchIssueInfo = async () => {
         if (!issueId) return;
         try {
@@ -71,28 +74,26 @@ export const IssueEditModal: React.FC<IssueEditModalProps> = ({
         }
     };
 
-    // Handle delete issue
     const handleDeleteIssue = async () => {
         if (!issueId) return;
 
         try {
             setDeleting(true);
             await issueService.delete(issueId);
-            message.success(`Issue ${issueCode} đã được xóa thành công`);
+            message.success(t('issue.editModal.deleteSuccess', { code: issueCode }));
             setDeleteConfirmVisible(false);
             onDelete?.();
             onClose();
             
             // Modal will close and parent will refresh
         } catch (error: unknown) {
-            const errorMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Không thể xóa issue';
+            const errorMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || t('issue.messages.deleteFailed');
             message.error(errorMessage);
         } finally {
             setDeleting(false);
         }
     };
 
-    // Reset when modal closes
     useEffect(() => {
         if (!visible) {
             setIssueCode('');
@@ -110,7 +111,12 @@ export const IssueEditModal: React.FC<IssueEditModalProps> = ({
                 title={
                     <Space>
                         <DeploymentUnitOutlined />
-                        <span>Chỉnh sửa Issue{issueCode ? `: ${issueCode}` : ''}</span>
+                        <span>
+                            {issueCode 
+                                ? t('issue.editModal.titleWithCode', { code: issueCode })
+                                : t('issue.editModal.title')
+                            }
+                        </span>
                     </Space>
                 }
                 onCancel={onClose}
@@ -118,19 +124,17 @@ export const IssueEditModal: React.FC<IssueEditModalProps> = ({
                 centered
                 footer={
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        {/* Delete Button - Left side */}
                         <Button
                             danger
                             icon={<DeleteOutlined />}
                             onClick={() => setDeleteConfirmVisible(true)}
                             loading={deleting}
                         >
-                            Xóa Issue
+                            {t('issue.editModal.deleteIssue')}
                         </Button>
 
-                        {/* Close Button - Right side */}
                         <Button onClick={onClose}>
-                            Đóng
+                            {t('issue.editModal.close')}
                         </Button>
                     </div>
                 }
@@ -139,7 +143,6 @@ export const IssueEditModal: React.FC<IssueEditModalProps> = ({
                 }}
             >
                 <Row gutter={24} style={{ height: '100%' }}>
-                    {/* Left Side - Issue Form */}
                     <Col span={14}>
                         <div
                             style={{
@@ -158,12 +161,10 @@ export const IssueEditModal: React.FC<IssueEditModalProps> = ({
                         </div>
                     </Col>
 
-                    {/* Divider */}
                     <Col span={1}>
                         <Divider type="vertical" style={{ height: '100%' }} />
                     </Col>
 
-                    {/* Right Side - Assignees, Watchers, Links, Comments & History */}
                     <Col span={9}>
                         <div
                             style={{
@@ -181,7 +182,7 @@ export const IssueEditModal: React.FC<IssueEditModalProps> = ({
                                         label: (
                                             <Space>
                                                 <UserOutlined />
-                                                <span>Assignees</span>
+                                                <span>{t('issue.tabs.assignees')}</span>
                                             </Space>
                                         ),
                                         children: issueId ? (
@@ -198,7 +199,7 @@ export const IssueEditModal: React.FC<IssueEditModalProps> = ({
                                         label: (
                                             <Space>
                                                 <EyeOutlined />
-                                                <span>Watchers</span>
+                                                <span>{t('issue.tabs.watchers')}</span>
                                             </Space>
                                         ),
                                         children: issueId ? (
@@ -216,7 +217,7 @@ export const IssueEditModal: React.FC<IssueEditModalProps> = ({
                                         label: (
                                             <Space>
                                                 <LinkOutlined />
-                                                <span>Links</span>
+                                                <span>{t('issue.tabs.links')}</span>
                                             </Space>
                                         ),
                                         children: issueId ? (
@@ -233,7 +234,7 @@ export const IssueEditModal: React.FC<IssueEditModalProps> = ({
                                         label: (
                                             <Space>
                                                 <CommentOutlined />
-                                                <span>Comments</span>
+                                                <span>{t('issue.tabs.comments')}</span>
                                             </Space>
                                         ),
                                         children: issueId ? (
@@ -250,7 +251,7 @@ export const IssueEditModal: React.FC<IssueEditModalProps> = ({
                                         label: (
                                             <Space>
                                                 <HistoryOutlined />
-                                                <span>History</span>
+                                                <span>{t('issue.tabs.history')}</span>
                                             </Space>
                                         ),
                                         children: issueId ? (
@@ -272,13 +273,13 @@ export const IssueEditModal: React.FC<IssueEditModalProps> = ({
                 title={
                     <Space style={{ color: '#ff4d4f' }}>
                         <ExclamationCircleOutlined />
-                        <span>Xác nhận xóa Issue</span>
+                        <span>{t('issue.editModal.deleteConfirmTitle')}</span>
                     </Space>
                 }
                 onCancel={() => setDeleteConfirmVisible(false)}
                 footer={[
                     <Button key="cancel" onClick={() => setDeleteConfirmVisible(false)}>
-                        Hủy
+                        {t('issue.editModal.deleteCancel')}
                     </Button>,
                     <Button
                         key="delete"
@@ -288,17 +289,17 @@ export const IssueEditModal: React.FC<IssueEditModalProps> = ({
                         onClick={handleDeleteIssue}
                         icon={<DeleteOutlined />}
                     >
-                        Xác nhận xóa
+                        {t('issue.editModal.deleteConfirm')}
                     </Button>,
                 ]}
                 width={500}
                 centered
             >
                 <Alert
-                    message="Cảnh báo: Hành động này không thể hoàn tác!"
+                    message={t('issue.editModal.deleteWarning')}
                     description={
                         <div style={{ marginTop: 8 }}>
-                            <p>Bạn có chắc chắn muốn xóa issue này?</p>
+                            <p>{t('issue.editModal.deleteConfirmMessage')}</p>
                             <div style={{ 
                                 background: '#fafafa', 
                                 padding: '12px', 
@@ -306,9 +307,9 @@ export const IssueEditModal: React.FC<IssueEditModalProps> = ({
                                 marginTop: '12px',
                                 border: '1px solid #f0f0f0'
                             }}>
-                                <Text strong>Issue:</Text> {issueCode}
+                                <Text strong>{t('issue.editModal.issue')}:</Text> {issueCode}
                                 <br />
-                                <Text strong>Tóm tắt:</Text> {issueSummary}
+                                <Text strong>{t('issue.editModal.summaryLabel')}:</Text> {issueSummary}
                             </div>
                         </div>
                     }
@@ -324,15 +325,15 @@ export const IssueEditModal: React.FC<IssueEditModalProps> = ({
                     border: '1px solid #ffccc7'
                 }}>
                     <Text strong style={{ color: '#ff4d4f' }}>
-                        Các dữ liệu sau sẽ bị xóa vĩnh viễn:
+                        {t('issue.editModal.deletedDataWarning')}
                     </Text>
                     <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
-                        <li>Tất cả assignees của issue</li>
-                        <li>Tất cả watchers của issue</li>
-                        <li>Tất cả comments của issue</li>
-                        <li>Tất cả links liên quan đến issue</li>
-                        <li>Lịch sử thay đổi của issue</li>
-                        <li>Liên kết với Sprint (nếu có)</li>
+                        <li>{t('issue.editModal.deletedDataList.assignees')}</li>
+                        <li>{t('issue.editModal.deletedDataList.watchers')}</li>
+                        <li>{t('issue.editModal.deletedDataList.comments')}</li>
+                        <li>{t('issue.editModal.deletedDataList.links')}</li>
+                        <li>{t('issue.editModal.deletedDataList.history')}</li>
+                        <li>{t('issue.editModal.deletedDataList.sprint')}</li>
                     </ul>
                 </div>
             </Modal>

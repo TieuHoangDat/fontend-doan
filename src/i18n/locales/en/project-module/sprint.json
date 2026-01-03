@@ -1,0 +1,92 @@
+{
+    "sprint": {
+      "title": "Sprint Backlog",
+      "backlog": "Backlog",
+      "createSprint": "Create Sprint",
+      "editSprint": "Edit Sprint",
+      "createIssue": "Create Issue",
+      "startSprint": "Start Sprint",
+      "completeSprint": "Complete",
+      "deleteSprint": "Delete Sprint",
+      "refresh": "Refresh",
+      "loading": "Loading sprint data...",
+      "noSprints": "No sprints",
+      "goal": "Goal",
+      
+      "status": {
+        "planning": "Planning",
+        "active": "Active",
+        "completed": "Completed",
+        "closed": "Closed"
+      },
+      
+      "form": {
+        "title": "Create New Sprint",
+        "editTitle": "Edit Sprint",
+        "sprintName": "Sprint Name",
+        "sprintNamePlaceholder": "e.g., Sprint 1, Alpha Release",
+        "sprintNameRequired": "Please enter sprint name",
+        "sprintNameMax": "Sprint name cannot exceed 255 characters",
+        "sprintGoal": "Sprint Goal",
+        "sprintGoalPlaceholder": "What do you want to achieve in this sprint?",
+        "duration": "Sprint Duration",
+        "durationDays": "Duration (Days)",
+        "durationDaysPlaceholder": "e.g., 14",
+        "durationHelp": "Auto-calculated from dates or enter manually",
+        "status": "Status",
+        "statusPlaceholder": "Select status"
+      },
+      
+      "filter": {
+        "search": "Search issues...",
+        "assignee": "Assignee",
+        "issueType": "Issue Type",
+        "epic": "Epic",
+        "clearAll": "Clear filters",
+        "filtering": "Filtering",
+        "issueCount": "{{count}} issues",
+        "filteredCount": "{{filtered}} / {{total}} issues",
+        "clearAllTooltip": "Clear all filters",
+        "totalLabel": "/ {{count}} total"
+      },
+      
+      "issue": {
+        "noIssuesInBacklog": "No issues in backlog",
+        "noIssuesInSprint": "No issues in this sprint",
+        "noMatchingIssues": "No matching issues with filters",
+        "issueCount": "{{count}} issues",
+        "storyPoints": "{{points}} SP",
+        "editIssue": "Edit issue"
+      },
+      
+      "messages": {
+        "loadFailed": "Cannot load data",
+        "createSuccess": "Sprint created successfully",
+        "updateSuccess": "Sprint updated successfully",
+        "deleteSuccess": "Sprint deleted successfully",
+        "startSuccess": "Sprint started successfully",
+        "completeSuccess": "Sprint completed successfully",
+        "moveSuccess": "Issue moved successfully",
+        "saveFailed": "Cannot save sprint",
+        "startFailed": "Cannot start sprint",
+        "completeFailed": "Cannot complete sprint",
+        "deleteFailed": "Cannot delete sprint",
+        "moveFailed": "Cannot move issue",
+        "invalidData": "Invalid data"
+      },
+      
+      "actions": {
+        "edit": "Edit",
+        "delete": "Delete",
+        "start": "Start Sprint",
+        "complete": "Complete Sprint"
+      },
+      
+      "buttons": {
+        "create": "Create",
+        "update": "Update",
+        "cancel": "Cancel",
+        "close": "Close"
+      }
+    }
+  }

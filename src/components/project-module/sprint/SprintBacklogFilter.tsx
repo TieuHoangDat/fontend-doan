@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import {
     Card,
@@ -19,6 +21,7 @@ import {
     AppstoreOutlined,
     FlagOutlined,
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { issueService, Employee, IssueType } from '@/lib/api/services/project-module/issue.service';
 
 const { Option } = Select;
@@ -43,6 +46,7 @@ export const SprintBacklogFilter: React.FC<SprintBacklogFilterProps> = ({
     totalIssues = 0,
     filteredCount,
 }) => {
+    const { t } = useTranslation();
     const [search, setSearch] = useState('');
     const [assigneeIds, setAssigneeIds] = useState<number[]>([]);
     const [issueTypeIds, setIssueTypeIds] = useState<number[]>([]);
@@ -53,7 +57,6 @@ export const SprintBacklogFilter: React.FC<SprintBacklogFilterProps> = ({
     const [epics, setEpics] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
 
-    // Fetch filter options
     useEffect(() => {
         const fetchFilterOptions = async () => {
             try {
@@ -76,7 +79,6 @@ export const SprintBacklogFilter: React.FC<SprintBacklogFilterProps> = ({
         fetchFilterOptions();
     }, [projectId]);
 
-    // Trigger filter change
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             onFilterChange({
@@ -85,12 +87,11 @@ export const SprintBacklogFilter: React.FC<SprintBacklogFilterProps> = ({
                 issueTypeIds,
                 epicIds,
             });
-        }, 300); // Debounce 300ms
+        }, 300);
 
         return () => clearTimeout(timeoutId);
     }, [search, assigneeIds, issueTypeIds, epicIds]);
 
-    // Clear all filters
     const handleClearFilters = () => {
         setSearch('');
         setAssigneeIds([]);
@@ -98,7 +99,6 @@ export const SprintBacklogFilter: React.FC<SprintBacklogFilterProps> = ({
         setEpicIds([]);
     };
 
-    // Check if any filter is active
     const hasActiveFilters = search || assigneeIds.length > 0 || issueTypeIds.length > 0 || epicIds.length > 0;
     const activeFilterCount = [
         search ? 1 : 0,
@@ -114,9 +114,8 @@ export const SprintBacklogFilter: React.FC<SprintBacklogFilterProps> = ({
             bodyStyle={{ padding: '12px 16px' }}
         >
             <Space wrap size="middle" style={{ width: '100%' }}>
-                {/* Search Input */}
                 <Input
-                    placeholder="Tìm kiếm issue..."
+                    placeholder={t('sprint.filter.search')}
                     prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -126,13 +125,12 @@ export const SprintBacklogFilter: React.FC<SprintBacklogFilterProps> = ({
 
                 <Divider type="vertical" style={{ height: 32 }} />
 
-                {/* Assignee Filter */}
                 <Select
                     mode="multiple"
                     placeholder={
                         <Space>
                             <UserOutlined />
-                            <span>Assignee</span>
+                            <span>{t('sprint.filter.assignee')}</span>
                         </Space>
                     }
                     value={assigneeIds}
@@ -157,13 +155,12 @@ export const SprintBacklogFilter: React.FC<SprintBacklogFilterProps> = ({
                     ))}
                 </Select>
 
-                {/* Issue Type Filter */}
                 <Select
                     mode="multiple"
                     placeholder={
                         <Space>
                             <AppstoreOutlined />
-                            <span>Loại issue</span>
+                            <span>{t('sprint.filter.issueType')}</span>
                         </Space>
                     }
                     value={issueTypeIds}
@@ -181,14 +178,13 @@ export const SprintBacklogFilter: React.FC<SprintBacklogFilterProps> = ({
                     ))}
                 </Select>
 
-                {/* Epic Filter */}
                 {epics.length > 0 && (
                     <Select
                         mode="multiple"
                         placeholder={
                             <Space>
                                 <FlagOutlined />
-                                <span>Epic</span>
+                                <span>{t('sprint.filter.epic')}</span>
                             </Space>
                         }
                         value={epicIds}
@@ -209,36 +205,35 @@ export const SprintBacklogFilter: React.FC<SprintBacklogFilterProps> = ({
 
                 <Divider type="vertical" style={{ height: 32 }} />
 
-                {/* Clear Filters Button */}
                 {hasActiveFilters && (
-                    <Tooltip title="Xóa tất cả bộ lọc">
+                    <Tooltip title={t('sprint.filter.clearAllTooltip')}>
                         <Button
                             icon={<ClearOutlined />}
                             onClick={handleClearFilters}
                             type="text"
                             danger
                         >
-                            Xóa lọc
+                            {t('sprint.filter.clearAll')}
                         </Button>
                     </Tooltip>
                 )}
 
-                {/* Filter Status */}
                 <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
                     {hasActiveFilters && (
                         <Badge count={activeFilterCount} size="small">
                             <Tag icon={<FilterOutlined />} color="blue">
-                                Đang lọc
+                                {t('sprint.filter.filtering')}
                             </Tag>
                         </Badge>
                     )}
                     <Tag color={hasActiveFilters ? 'orange' : 'default'}>
                         {filteredCount !== undefined ? (
-                            <>
-                                {filteredCount} / {totalIssues} issues
-                            </>
+                            t('sprint.filter.filteredCount', {
+                                filtered: filteredCount,
+                                total: totalIssues
+                            })
                         ) : (
-                            <>{totalIssues} issues</>
+                            t('sprint.filter.issueCount', { count: totalIssues })
                         )}
                     </Tag>
                 </div>
@@ -247,22 +242,17 @@ export const SprintBacklogFilter: React.FC<SprintBacklogFilterProps> = ({
     );
 };
 
-/**
- * Filter issues dựa trên filter values
- */
 export const filterIssues = (issues: any[], filters: SprintFilterValues): any[] => {
     if (!issues) return [];
     
     let filteredIssues = [...issues];
 
-    // Search filter
     if (filters.search) {
         const searchLower = filters.search.toLowerCase();
         filteredIssues = filteredIssues.filter(
             (issue) =>
                 issue.issue_code?.toLowerCase().includes(searchLower) ||
                 issue.summary?.toLowerCase().includes(searchLower) ||
-                // Tìm trong assignees
                 (issue.assignees && issue.assignees.some((a: any) => 
                     `${a.first_name || ''} ${a.last_name || ''}`.toLowerCase().includes(searchLower) ||
                     a.full_name?.toLowerCase().includes(searchLower)
@@ -270,7 +260,6 @@ export const filterIssues = (issues: any[], filters: SprintFilterValues): any[] 
         );
     }
 
-    // Assignee filter
     if (filters.assigneeIds.length > 0) {
         filteredIssues = filteredIssues.filter((issue) => {
             if (issue.assignees && Array.isArray(issue.assignees) && issue.assignees.length > 0) {
@@ -280,7 +269,6 @@ export const filterIssues = (issues: any[], filters: SprintFilterValues): any[] 
         });
     }
 
-    // Issue Type filter
     if (filters.issueTypeIds.length > 0) {
         filteredIssues = filteredIssues.filter((issue) => {
             const typeId = issue.issue_type_id || issue.issue_type?.id;
@@ -288,7 +276,6 @@ export const filterIssues = (issues: any[], filters: SprintFilterValues): any[] 
         });
     }
 
-    // Epic filter
     if (filters.epicIds.length > 0) {
         filteredIssues = filteredIssues.filter((issue) => {
             const epicId = issue.epic_link_id || issue.epic_link?.id;
@@ -299,9 +286,6 @@ export const filterIssues = (issues: any[], filters: SprintFilterValues): any[] 
     return filteredIssues;
 };
 
-/**
- * Hook để filter sprint backlog data
- */
 export const useFilteredSprintData = (
     backlogIssues: any[],
     sprintIssues: Record<number, any[]>,

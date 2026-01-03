@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import {
     Modal,
@@ -10,6 +12,7 @@ import {
     Space,
 } from 'antd';
 import { FlagOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { epicService, Epic, CreateEpicDto, UpdateEpicDto } from '@/lib/api/services/project-module/epic.service';
 import { Project } from '@/lib/api/services/project-module/project.service';
@@ -32,6 +35,7 @@ export const EpicFormModal: React.FC<EpicFormModalProps> = ({
     onClose,
     onSuccess,
 }) => {
+    const { t } = useTranslation();
     const [form] = Form.useForm();
     const [submitting, setSubmitting] = useState(false);
 
@@ -68,10 +72,10 @@ export const EpicFormModal: React.FC<EpicFormModalProps> = ({
 
             if (isEditing) {
                 await epicService.update(epic.id, submitData);
-                message.success('Đã cập nhật epic');
+                message.success(t('epic.messages.updateSuccess'));
             } else {
                 await epicService.create(submitData as CreateEpicDto);
-                message.success('Đã tạo epic mới');
+                message.success(t('epic.messages.createSuccess'));
             }
 
             form.resetFields();
@@ -79,9 +83,9 @@ export const EpicFormModal: React.FC<EpicFormModalProps> = ({
         } catch (error: any) {
             console.error('Error saving epic:', error);
             if (error.response?.status === 400) {
-                message.error(error.response.data.message || 'Dữ liệu không hợp lệ');
+                message.error(error.response.data.message || t('common.messages.error.generic'));
             } else {
-                message.error('Không thể lưu epic');
+                message.error(t('common.messages.error.generic'));
             }
         } finally {
             setSubmitting(false);
@@ -99,7 +103,7 @@ export const EpicFormModal: React.FC<EpicFormModalProps> = ({
             title={
                 <Space>
                     <FlagOutlined />
-                    <span>{isEditing ? 'Edit Epic' : 'Create New Epic'}</span>
+                    <span>{isEditing ? t('epic.editEpic') : t('epic.createEpic')}</span>
                 </Space>
             }
             onCancel={handleCancel}
@@ -115,11 +119,11 @@ export const EpicFormModal: React.FC<EpicFormModalProps> = ({
                 {/* Project */}
                 <Form.Item
                     name="project_id"
-                    label="Project"
-                    rules={[{ required: true, message: 'Please select a project' }]}
+                    label={t('epic.form.project')}
+                    rules={[{ required: true, message: t('epic.form.projectRequired') }]}
                 >
                     <Select
-                        placeholder="Select project"
+                        placeholder={t('epic.form.projectPlaceholder')}
                         showSearch
                         optionFilterProp="children"
                     >
@@ -134,33 +138,33 @@ export const EpicFormModal: React.FC<EpicFormModalProps> = ({
                 {/* Epic Name */}
                 <Form.Item
                     name="epic_name"
-                    label="Epic Name"
+                    label={t('epic.form.epicName')}
                     rules={[
-                        { required: true, message: 'Please enter epic name' },
-                        { max: 255, message: 'Epic name cannot exceed 255 characters' },
+                        { required: true, message: t('epic.form.epicNameRequired') },
+                        { max: 255, message: t('epic.form.epicNameMax') },
                     ]}
                 >
-                    <Input placeholder="Enter epic name" maxLength={255} />
+                    <Input placeholder={t('epic.form.epicNamePlaceholder')} maxLength={255} />
                 </Form.Item>
 
                 {/* Goal */}
-                <Form.Item name="goal" label="Goal">
+                <Form.Item name="goal" label={t('epic.form.goal')}>
                     <TextArea
                         rows={3}
-                        placeholder="Enter epic goal or description"
+                        placeholder={t('epic.form.goalPlaceholder')}
                         maxLength={1000}
                         showCount
                     />
                 </Form.Item>
 
                 {/* Status */}
-                <Form.Item name="status" label="Status">
-                    <Select placeholder="Select status" allowClear>
-                        <Option value="Planning">Planning</Option>
-                        <Option value="In Progress">In Progress</Option>
-                        <Option value="On Hold">On Hold</Option>
-                        <Option value="Done">Done</Option>
-                        <Option value="Cancelled">Cancelled</Option>
+                <Form.Item name="status" label={t('epic.form.status')}>
+                    <Select placeholder={t('epic.form.statusPlaceholder')} allowClear>
+                        <Option value="Planning">{t('epic.status.planning')}</Option>
+                        <Option value="In Progress">{t('epic.status.inProgress')}</Option>
+                        <Option value="On Hold">{t('epic.status.onHold')}</Option>
+                        <Option value="Done">{t('epic.status.done')}</Option>
+                        <Option value="Cancelled">{t('epic.status.cancelled')}</Option>
                     </Select>
                 </Form.Item>
 
@@ -168,7 +172,7 @@ export const EpicFormModal: React.FC<EpicFormModalProps> = ({
                 <Space style={{ width: '100%' }} size="large">
                     <Form.Item
                         name="start_date"
-                        label="Start Date"
+                        label={t('epic.form.startDate')}
                         style={{ flex: 1, marginBottom: 0 }}
                     >
                         <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" />
@@ -176,7 +180,7 @@ export const EpicFormModal: React.FC<EpicFormModalProps> = ({
 
                     <Form.Item
                         name="due_date"
-                        label="Due Date"
+                        label={t('epic.form.dueDate')}
                         style={{ flex: 1, marginBottom: 0 }}
                         rules={[
                             ({ getFieldValue }) => ({
@@ -187,7 +191,7 @@ export const EpicFormModal: React.FC<EpicFormModalProps> = ({
                                     }
                                     if (value.isBefore(startDate)) {
                                         return Promise.reject(
-                                            new Error('Due date must be after start date')
+                                            new Error(t('epic.form.dueDateError'))
                                         );
                                     }
                                     return Promise.resolve();
@@ -202,9 +206,11 @@ export const EpicFormModal: React.FC<EpicFormModalProps> = ({
                 {/* Footer Buttons */}
                 <Form.Item style={{ marginTop: 24, marginBottom: 0 }}>
                     <Space style={{ float: 'right' }}>
-                        <Button onClick={handleCancel}>Cancel</Button>
+                        <Button onClick={handleCancel}>
+                            {t('epic.buttons.cancel')}
+                        </Button>
                         <Button type="primary" htmlType="submit" loading={submitting}>
-                            {isEditing ? 'Update' : 'Create'}
+                            {isEditing ? t('epic.buttons.update') : t('epic.buttons.create')}
                         </Button>
                     </Space>
                 </Form.Item>

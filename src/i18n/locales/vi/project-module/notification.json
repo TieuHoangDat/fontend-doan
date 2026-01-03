@@ -1,0 +1,59 @@
+{
+    "notification": {
+      "title": "Cài đặt Thông báo",
+      "loading": "Đang tải cấu hình thông báo...",
+      "refresh": "Làm mới",
+      "emailSettings": "Cài đặt Email Thông báo",
+      "selectRecipients": "Chọn các người nhận sẽ nhận email khi sự kiện xảy ra. Tích/bỏ tích checkbox để thêm/xóa người nhận.",
+      
+      "projectInfo": {
+        "title": "Thông tin Dự án",
+        "projectName": "Tên dự án",
+        "projectKey": "Mã dự án",
+        "notificationScheme": "Notification Scheme",
+        "totalEvents": "Tổng sự kiện",
+        "configured": "Đã cấu hình",
+        "totalRules": "Tổng quy tắc"
+      },
+      
+      "scheme": {
+        "noScheme": "Chưa có Notification Scheme",
+        "noSchemeDescription": "Dự án này chưa được gán notification scheme.",
+        "contactAdmin": "Vui lòng liên hệ admin để cấu hình."
+      },
+      
+      "events": {
+        "noEvents": "Không có sự kiện",
+        "configured": "{{count}} người nhận đã cấu hình",
+        "noRecipients": "Chưa có người nhận (thông báo tắt)",
+        "total": "Tổng sự kiện",
+        "activeRecipients": "Người nhận hoạt động"
+      },
+      
+      "summary": {
+        "title": "Tóm tắt",
+        "totalEvents": "Tổng sự kiện",
+        "configured": "Đã cấu hình",
+        "activeRecipients": "Người nhận hoạt động"
+      },
+      
+      "eventTypes": {
+        "created": "Đã tạo",
+        "updated": "Đã cập nhật",
+        "assigned": "Đã gán",
+        "commented": "Đã bình luận",
+        "statusChanged": "Đã đổi trạng thái",
+        "resolved": "Đã giải quyết",
+        "closed": "Đã đóng",
+        "workLogged": "Đã ghi nhận công việc"
+      },
+      
+      "messages": {
+        "loadError": "Không thể tải cấu hình thông báo",
+        "addSuccess": "Đã thêm {{recipient}} vào {{event}}",
+        "removeSuccess": "Đã xóa {{recipient}} khỏi {{event}}",
+        "updateError": "Không thể cập nhật người nhận",
+        "noSchemeWarning": "Dự án chưa có notification scheme"
+      }
+    }
+  }

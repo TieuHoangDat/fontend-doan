@@ -1,23 +1,14 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
 import { createPortal } from 'react-dom';
 import invariant from 'tiny-invariant';
+import { Dropdown, message } from 'antd';
+import { MoreOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import type { MenuProps } from 'antd';
+import { useTranslation } from 'react-i18next';
 
-import { IconButton } from '@atlaskit/button/new';
-import DropdownMenu, {
-	type CustomTriggerProps,
-	DropdownItem,
-	DropdownItemGroup,
-} from '@atlaskit/dropdown-menu';
-// eslint-disable-next-line @atlaskit/design-system/no-banned-imports
-import mergeRefs from '@atlaskit/ds-lib/merge-refs';
 import Heading from '@atlaskit/heading';
-// This is the smaller MoreIcon soon to be more easily accessible with the
-// ongoing icon project
-import MoreIcon from '@atlaskit/icon/core/migration/show-more-horizontal--editor-more';
 import { easeInOut } from '@atlaskit/motion/curves';
 import { durations } from '@atlaskit/motion/durations';
-import { fg } from '@atlaskit/platform-feature-flags';
 import { autoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/element';
 import {
 	attachClosestEdge,
@@ -32,37 +23,25 @@ import {
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { centerUnderPointer } from '@atlaskit/pragmatic-drag-and-drop/element/center-under-pointer';
 import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
-// eslint-disable-next-line @atlaskit/design-system/no-emotion-primitives -- to be migrated to @atlaskit/primitives/compiled – go/akcss
 import { Box, Flex, Inline, Stack, xcss } from '@atlaskit/primitives';
 import { token } from '@atlaskit/tokens';
-
-import { type ColumnType } from '../../data/people';
 
 import { useBoardContext } from './board-context';
 import { Card } from './card';
 import { ColumnContext, type ColumnContextProps, useColumnContext } from './column-context';
+import { workflowStatusService } from '@/lib/api/services/project-module/workflow-status.service';
+import { EditWorkflowStatusModal } from './EditWorkflowStatusModal';
 
 const columnStyles = xcss({
 	width: '300px',
 	backgroundColor: 'elevation.surface.sunken',
 	borderRadius: 'radius.xlarge',
-	// eslint-disable-next-line @atlaskit/ui-styling-standard/no-unsafe-values, @atlaskit/ui-styling-standard/no-imported-style-values
 	transition: `background ${durations.medium}ms ${easeInOut}`,
 	position: 'relative',
-	/**
-	 * TODO: figure out hover color.
-	 * There is no `elevation.surface.sunken.hovered` token,
-	 * so leaving this for now.
-	 */
 });
 
 const stackStyles = xcss({
-	// allow the container to be shrunk by a parent height
-	// https://www.joshwcomeau.com/css/interactive-guide-to-flexbox/#the-minimum-size-gotcha-11
 	minHeight: '0',
-
-	// ensure our card list grows to be all the available space
-	// so that users can easily drop on en empty list
 	flexGrow: 1,
 });
 
@@ -86,12 +65,27 @@ const columnHeaderStyles = xcss({
 	userSelect: 'none',
 });
 
-/**
- * Note: not making `'is-dragging'` a `State` as it is
- * a _parallel_ state to `'is-column-over'`.
- *
- * Our board allows you to be over the column that is currently dragging
- */
+export type ColumnType = {
+	title: string;
+	columnId: string;
+	items: Issue[];
+};
+
+export type Issue = {
+	id: number;
+	issueId: string;
+	name: string;
+	summary: string;
+	epic_name: string;
+	issue_type: string;
+	priority: string;
+	points: number;
+	role: string;
+	avatarUrl: string;
+};
+
+export type ColumnMap = { [columnId: string]: ColumnType };
+
 type State =
 	| { type: 'idle' }
 	| { type: 'is-card-over' }
@@ -99,7 +93,6 @@ type State =
 	| { type: 'generate-safari-column-preview'; container: HTMLElement }
 	| { type: 'generate-column-preview' };
 
-// preventing re-renders with stable state objects
 const idle: State = { type: 'idle' };
 const isCardOver: State = { type: 'is-card-over' };
 
@@ -113,23 +106,6 @@ const stateStyles: {
 		backgroundColor: 'color.background.selected.hovered',
 	}),
 	'is-column-over': undefined,
-	/**
-	 * **Browser bug workaround**
-	 *
-	 * _Problem_
-	 * When generating a drag preview for an element
-	 * that has an inner scroll container, the preview can include content
-	 * vertically before or after the element
-	 *
-	 * _Fix_
-	 * We make the column a new stacking context when the preview is being generated.
-	 * We are not making a new stacking context at all times, as this _can_ mess up
-	 * other layering components inside of your card
-	 *
-	 * _Fix: Safari_
-	 * We have not found a great workaround yet. So for now we are just rendering
-	 * a custom drag preview
-	 */
 	'generate-column-preview': xcss({
 		isolation: 'isolate',
 	}),
@@ -140,7 +116,15 @@ const isDraggingStyles = xcss({
 	opacity: 0.4,
 });
 
-export const Column = memo(function Column({ column }: { column: ColumnType }) {
+export const Column = memo(function Column({ 
+	column,
+	projectId,
+	onRefresh,
+}: { 
+	column: ColumnType;
+	projectId?: number;
+	onRefresh?: () => void;
+}) {
 	const columnId = column.columnId;
 	const columnRef = useRef<HTMLDivElement | null>(null);
 	const columnInnerRef = useRef<HTMLDivElement | null>(null);
@@ -230,7 +214,6 @@ export const Column = memo(function Column({ column }: { column: ColumnType }) {
 					});
 				},
 				onDrag: (args) => {
-					// skip react re-render if edge is not changing
 					setState((current) => {
 						const closestEdge: Edge | null = extractClosestEdge(args.self.data);
 						if (current.type === 'is-column-over' && current.closestEdge === closestEdge) {
@@ -282,10 +265,6 @@ export const Column = memo(function Column({ column }: { column: ColumnType }) {
 				direction="column"
 				xcss={[columnStyles, stateStyles[state.type]]}
 			>
-				{/* This element takes up the same visual space as the column.
-          We are using a separate element so we can have two drop targets
-          that take up the same visual space (one for cards, one for columns)
-        */}
 				<Stack xcss={stackStyles} ref={columnInnerRef}>
 					<Stack xcss={[stackStyles, isDragging ? isDraggingStyles : undefined]}>
 						<Inline
@@ -298,7 +277,11 @@ export const Column = memo(function Column({ column }: { column: ColumnType }) {
 							<Heading size="xxsmall" as="span" testId={`column-header-title-${columnId}`}>
 								{column.title}
 							</Heading>
-							<ActionMenu />
+							<ActionMenu 
+								projectId={projectId} 
+								columnTitle={column.title}
+								onRefresh={onRefresh}
+							/>
 						</Inline>
 						<Box xcss={scrollContainerStyles} ref={scrollableRef}>
 							<Stack xcss={cardListStyles} space="space.100">
@@ -337,64 +320,130 @@ function SafariColumnPreview({ column }: { column: ColumnType }) {
 	);
 }
 
-function ActionMenu() {
-	return (
-		<DropdownMenu
-			trigger={DropdownMenuTrigger}
-			// shouldRenderToParent={fg('should-render-to-parent-should-be-true-design-syst')}
-			shouldRenderToParent={true}
-			placement="bottom-end"
-		>
-			<ActionMenuItems />
-		</DropdownMenu>
-	);
-}
-
-function ActionMenuItems() {
+function ActionMenu({ 
+	projectId,
+	columnTitle,
+	onRefresh,
+}: { 
+	projectId?: number;
+	columnTitle?: string;
+	onRefresh?: () => void;
+}) {
+	const { t } = useTranslation();
 	const { columnId } = useColumnContext();
-	const { getColumns, reorderColumn } = useBoardContext();
+	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+	const [statusData, setStatusData] = useState<any>(null);
 
-	const columns = getColumns();
-	const startIndex = columns.findIndex((column) => column.columnId === columnId);
+	const handleEdit = useCallback(async () => {
+		if (!projectId) {
+			message.error(t('workflowStatus.messages.projectIdRequired'));
+			return;
+		}
 
-	const moveLeft = useCallback(() => {
-		reorderColumn({
-			startIndex,
-			finishIndex: startIndex - 1,
-		});
-	}, [reorderColumn, startIndex]);
+		try {
+			// Fetch current status data
+			const data = await workflowStatusService.getById(parseInt(columnId), projectId);
+			setStatusData(data);
+			setIsEditModalOpen(true);
+		} catch (error: any) {
+			message.error(
+				error.response?.data?.message || 
+				t('workflowStatus.messages.loadFailed')
+			);
+		}
+	}, [columnId, projectId, t]);
 
-	const moveRight = useCallback(() => {
-		reorderColumn({
-			startIndex,
-			finishIndex: startIndex + 1,
-		});
-	}, [reorderColumn, startIndex]);
+	const deleteColumn = useCallback(async () => {
+		if (!projectId) {
+			message.error(t('workflowStatus.messages.projectIdRequired'));
+			return;
+		}
+		
+		try {
+			await workflowStatusService.delete(parseInt(columnId), projectId);
+			message.success(t('workflowStatus.messages.deleteSuccess'));
+			// Refresh page to reload board
+			if (onRefresh) {
+				onRefresh();
+			} else {
+				window.location.reload();
+			}
+		} catch (error: any) {
+			message.error(
+				error.response?.data?.message || 
+				t('workflowStatus.messages.deleteFailed')
+			);
+		}
+	}, [columnId, projectId, onRefresh, t]);
 
-	const isMoveLeftDisabled = startIndex === 0;
-	const isMoveRightDisabled = startIndex === columns.length - 1;
+	const handleEditSuccess = () => {
+		if (onRefresh) {
+			onRefresh();
+		} else {
+			window.location.reload();
+		}
+	};
+
+	const menuItems: MenuProps['items'] = [
+		{
+			key: 'edit',
+			label: t('column.edit', 'Edit column'),
+			icon: <EditOutlined />,
+			onClick: handleEdit,
+		},
+		{
+			type: 'divider',
+		},
+		{
+			key: 'delete',
+			label: t('column.delete', 'Delete column'),
+			icon: <DeleteOutlined />,
+			danger: true,
+			onClick: deleteColumn,
+		},
+	];
 
 	return (
-		<DropdownItemGroup>
-			<DropdownItem onClick={moveLeft} isDisabled={isMoveLeftDisabled}>
-				Move left
-			</DropdownItem>
-			<DropdownItem onClick={moveRight} isDisabled={isMoveRightDisabled}>
-				Move right
-			</DropdownItem>
-		</DropdownItemGroup>
-	);
-}
+		<>
+			<Dropdown 
+				menu={{ items: menuItems }} 
+				trigger={['click']}
+				placement="bottomRight"
+			>
+				<div
+					style={{
+						cursor: 'pointer',
+						padding: '4px',
+						borderRadius: '4px',
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+					}}
+					onClick={(e) => e.stopPropagation()}
+				>
+					<MoreOutlined 
+						style={{ 
+							fontSize: '16px',
+							color: '#626f86',
+						}} 
+					/>
+				</div>
+			</Dropdown>
 
-function DropdownMenuTrigger({ triggerRef, ...triggerProps }: CustomTriggerProps) {
-	return (
-		<IconButton
-			ref={mergeRefs([triggerRef])}
-			appearance="subtle"
-			label="Actions"
-			spacing="compact"
-			icon={(iconProps) => <MoreIcon {...iconProps} size="small" />}
-			{...triggerProps}
-		/>
+			{statusData && (
+				<EditWorkflowStatusModal
+					visible={isEditModalOpen}
+					onClose={() => setIsEditModalOpen(false)}
+					onSuccess={handleEditSuccess}
+					statusId={parseInt(columnId)}
+					projectId={projectId!}
+					initialValues={{
+						status_name: statusData.status_name,
+						status_category: statusData.status_category,
+						is_initial_status: statusData.is_initial_status,
+					}}
+				/>
+			)}
+		</>
 	);
 }

@@ -1,6 +1,9 @@
+'use client';
+
 import React from 'react';
 import { Card, Space, Tag, Avatar, Tooltip, Typography, Button } from 'antd';
 import { UserOutlined, DragOutlined, EditOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { Issue } from './sprint.types';
 
 const { Text } = Typography;
@@ -16,6 +19,8 @@ export const SprintIssueCard: React.FC<SprintIssueCardProps> = ({
     isDragging,
     onEdit,
 }) => {
+    const { t } = useTranslation();
+
     return (
         <Card
             size="small"
@@ -37,7 +42,6 @@ export const SprintIssueCard: React.FC<SprintIssueCardProps> = ({
                     width: '100%',
                 }}
             >
-                {/* Drag Handle */}
                 <DragOutlined 
                     style={{ 
                         color: '#8c8c8c', 
@@ -47,7 +51,6 @@ export const SprintIssueCard: React.FC<SprintIssueCardProps> = ({
                     }} 
                 />
 
-                {/* Issue Code */}
                 <Text 
                     strong 
                     style={{ 
@@ -60,7 +63,6 @@ export const SprintIssueCard: React.FC<SprintIssueCardProps> = ({
                     {issue.issue_code}
                 </Text>
 
-                {/* Issue Type */}
                 {issue.issue_type && (
                     <Tag 
                         style={{ 
@@ -73,7 +75,6 @@ export const SprintIssueCard: React.FC<SprintIssueCardProps> = ({
                     </Tag>
                 )}
 
-                {/* Summary */}
                 <Text 
                     style={{ 
                         fontSize: 13,
@@ -87,9 +88,7 @@ export const SprintIssueCard: React.FC<SprintIssueCardProps> = ({
                     {issue.summary}
                 </Text>
 
-                {/* Right side info */}
                 <Space size={8} style={{ flexShrink: 0 }}>
-                    {/* Story Points */}
                     {issue.story_points && (
                         <Tag 
                             color="blue" 
@@ -99,11 +98,10 @@ export const SprintIssueCard: React.FC<SprintIssueCardProps> = ({
                                 fontWeight: 500,
                             }}
                         >
-                            {issue.story_points} SP
+                            {t('sprint.issue.storyPoints', { points: issue.story_points })}
                         </Tag>
                     )}
 
-                    {/* Assignees */}
                     {issue.assignees && issue.assignees.length > 0 && (
                         <Avatar.Group 
                             maxCount={3} 
@@ -130,9 +128,8 @@ export const SprintIssueCard: React.FC<SprintIssueCardProps> = ({
                         </Avatar.Group>
                     )}
 
-                    {/* Edit Button */}
                     {onEdit && (
-                        <Tooltip title="Edit issue">
+                        <Tooltip title={t('sprint.issue.editIssue')}>
                             <Button
                                 type="text"
                                 size="small"

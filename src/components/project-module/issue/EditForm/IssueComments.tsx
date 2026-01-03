@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import {
     List,
@@ -17,13 +19,14 @@ import {
     EditOutlined,
     DeleteOutlined,
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { issueService, IssueComment } from '@/lib/api/services/project-module/issue.service';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/vi';
+import 'dayjs/locale/en';
 
 dayjs.extend(relativeTime);
-dayjs.locale('vi');
 
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -43,13 +46,14 @@ type Comment = {
 
 type IssueCommentsProps = {
     issueId: number;
-    currentEmployeeId?: number; // ID của user hiện tại để check quyền edit/delete
+    currentEmployeeId?: number;
 };
 
 export const IssueComments: React.FC<IssueCommentsProps> = ({
     issueId,
-    currentEmployeeId = 1, // Default for demo
+    currentEmployeeId = 1,
 }) => {
+    const { t, i18n } = useTranslation();
     const [comments, setComments] = useState<Comment[]>([]);
     const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);
@@ -57,7 +61,11 @@ export const IssueComments: React.FC<IssueCommentsProps> = ({
     const [editingId, setEditingId] = useState<number | null>(null);
     const [editContent, setEditContent] = useState('');
 
-    // Fetch comments
+    // Set dayjs locale based on i18n language
+    useEffect(() => {
+        dayjs.locale(i18n.language === 'vi' ? 'vi' : 'en');
+    }, [i18n.language]);
+
     const fetchComments = async () => {
         try {
             setLoading(true);
@@ -65,71 +73,66 @@ export const IssueComments: React.FC<IssueCommentsProps> = ({
             setComments(data);
         } catch (error) {
             console.error('Error fetching comments:', error);
-            message.error('Không thể tải danh sách comment');
+            message.error(t('issue.comments.loadFailed'));
         } finally {
             setLoading(false);
         }
     };
 
-    // Create comment
     const handleCreateComment = async () => {
         if (!newComment.trim()) {
-            message.warning('Vui lòng nhập nội dung comment');
+            message.warning(t('issue.comments.contentRequired'));
             return;
         }
 
         try {
             setSubmitting(true);
             await issueService.createComment(issueId, currentEmployeeId, newComment);
-            message.success('Đã thêm comment');
+            message.success(t('issue.comments.createSuccess'));
             setNewComment('');
             fetchComments();
         } catch (error) {
             console.error('Error creating comment:', error);
-            message.error('Không thể thêm comment');
+            message.error(t('issue.comments.createFailed'));
         } finally {
             setSubmitting(false);
         }
     };
 
-    // Update comment
     const handleUpdateComment = async (commentId: number) => {
         if (!editContent.trim()) {
-            message.warning('Vui lòng nhập nội dung comment');
+            message.warning(t('issue.comments.contentRequired'));
             return;
         }
 
         try {
             await issueService.updateComment(issueId, commentId, editContent);
-            message.success('Đã cập nhật comment');
+            message.success(t('issue.comments.updateSuccess'));
             setEditingId(null);
             setEditContent('');
             fetchComments();
         } catch (error) {
             console.error('Error updating comment:', error);
-            message.error('Không thể cập nhật comment');
+            message.error(t('issue.comments.updateFailed'));
         }
     };
 
-    // Delete comment
     const handleDeleteComment = async (commentId: number) => {
         try {
             await issueService.deleteComment(issueId, commentId);
-            message.success('Đã xóa comment');
+            message.success(t('issue.comments.deleteSuccess'));
             fetchComments();
         } catch (error) {
             console.error('Error deleting comment:', error);
-            message.error('Không thể xóa comment');
+            message.error(t('issue.comments.deleteFailed'));
         }
     };
 
-    // Start editing
     const startEditing = (comment: Comment) => {
         setEditingId(comment.id);
         setEditContent(comment.content);
     };
 
-    // Cancel editing
     const cancelEditing = () => {
         setEditingId(null);
         setEditContent('');
@@ -148,7 +151,6 @@ export const IssueComments: React.FC<IssueCommentsProps> = ({
             height: '70%',
             minHeight: 430 
         }}>
-            {/* Comments List */}
             <div style={{ 
                 flex: 1, 
                 overflowY: 'auto', 
@@ -158,7 +160,7 @@ export const IssueComments: React.FC<IssueCommentsProps> = ({
                 <Spin spinning={loading}>
                     {comments.length === 0 ? (
                         <Empty
-                            description="Chưa có comment nào"
+                            description={t('issue.comments.noComments')}
                             style={{ marginTop: 60 }}
                         />
                     ) : (
@@ -200,10 +202,10 @@ export const IssueComments: React.FC<IssueCommentsProps> = ({
                                                             onClick={() => startEditing(comment)}
                                                         />
                                                         <Popconfirm
-                                                            title="Xóa comment này?"
+                                                            title={t('issue.comments.deleteConfirm')}
                                                             onConfirm={() => handleDeleteComment(comment.id)}
-                                                            okText="Xóa"
-                                                            cancelText="Hủy"
+                                                            okText={t('issue.comments.delete')}
+                                                            cancelText={t('issue.comments.cancel')}
                                                         >
                                                             <Button
                                                                 type="text"
@@ -231,13 +233,13 @@ export const IssueComments: React.FC<IssueCommentsProps> = ({
                                                             size="small"
                                                             onClick={() => handleUpdateComment(comment.id)}
                                                         >
-                                                            Lưu
+                                                            {t('issue.comments.save')}
                                                         </Button>
                                                         <Button
                                                             size="small"
                                                             onClick={cancelEditing}
                                                         >
-                                                            Hủy
+                                                            {t('issue.comments.cancel')}
                                                         </Button>
                                                     </Space>
                                                 </Space>
@@ -255,7 +257,6 @@ export const IssueComments: React.FC<IssueCommentsProps> = ({
                 </Spin>
             </div>
 
-            {/* New Comment Input */}
             <div style={{ 
                 borderTop: '1px solid #f0f0f0', 
                 paddingTop: 16 
@@ -264,7 +265,7 @@ export const IssueComments: React.FC<IssueCommentsProps> = ({
                     <TextArea
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="Viết comment..."
+                        placeholder={t('issue.comments.writeComment')}
                         rows={3}
                         onPressEnter={(e) => {
                             if (e.ctrlKey || e.metaKey) {
@@ -279,7 +280,7 @@ export const IssueComments: React.FC<IssueCommentsProps> = ({
                         onClick={handleCreateComment}
                         style={{ marginTop: 0, alignSelf: 'flex-end' }}
                     >
-                        Gửi comment
+                        {t('issue.comments.addComment')}
                     </Button>
                 </Space.Compact>
             </div>

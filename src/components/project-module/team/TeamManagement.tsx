@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import {
     Table,
@@ -31,6 +33,7 @@ import {
     MoreOutlined,
     SafetyOutlined,
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import { AddMemberModal } from './AddMemberModal';
@@ -49,6 +52,7 @@ type TeamManagementProps = {
 };
 
 export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => {
+    const { t } = useTranslation();
     const [members, setMembers] = useState<TeamMember[]>([]);
     const [roles, setRoles] = useState<ProjectRole[]>([]);
     const [statistics, setStatistics] = useState<TeamStatistics | null>(null);
@@ -56,11 +60,8 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => 
     const [searchText, setSearchText] = useState('');
     const [filterRole, setFilterRole] = useState<number | undefined>();
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-
-    // Modal states
     const [addModalVisible, setAddModalVisible] = useState(false);
 
-    // Fetch data
     const fetchData = async () => {
         try {
             setLoading(true);
@@ -74,7 +75,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => 
             setStatistics(statsData);
         } catch (error) {
             console.error('Error fetching team data:', error);
-            message.error('Không thể tải dữ liệu team');
+            message.error(t('team.messages.loadFailed'));
         } finally {
             setLoading(false);
         }
@@ -86,22 +87,20 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => 
         }
     }, [projectId]);
 
-    // Handle remove member
     const handleRemove = async (employeeId: number) => {
         try {
             await teamService.removeMember(projectId, employeeId);
-            message.success('Đã xóa thành viên');
+            message.success(t('team.messages.removeSuccess'));
             fetchData();
         } catch (error: any) {
             console.error('Error removing member:', error);
-            message.error(error.response?.data?.message || 'Không thể xóa thành viên');
+            message.error(error.response?.data?.message || t('team.messages.removeFailed'));
         }
     };
 
-    // Handle bulk remove
     const handleBulkRemove = async () => {
         if (selectedRowKeys.length === 0) {
-            message.warning('Vui lòng chọn thành viên để xóa');
+            message.warning(t('team.messages.selectAtLeastOne'));
             return;
         }
 
@@ -110,32 +109,33 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => 
             const result = await teamService.removeMultipleMembers(projectId, employeeIds);
             
             if (result.success > 0) {
-                message.success(`Đã xóa ${result.success}/${result.total} thành viên`);
+                message.success(t('team.messages.removeMultipleSuccess', {
+                    success: result.success,
+                    total: result.total
+                }));
                 setSelectedRowKeys([]);
                 fetchData();
             }
         } catch (error) {
             console.error('Error removing members:', error);
-            message.error('Không thể xóa thành viên');
+            message.error(t('team.messages.removeFailed'));
         }
     };
 
-    // Handle change role
     const handleChangeRole = async (employeeId: number, newRoleId: number) => {
         try {
             await teamService.assignRole(projectId, employeeId, { project_role_id: newRoleId });
-            message.success('Đã thay đổi role');
+            message.success(t('team.messages.changeRoleSuccess'));
             fetchData();
         } catch (error: any) {
             console.error('Error changing role:', error);
-            message.error(error.response?.data?.message || 'Không thể thay đổi role');
+            message.error(error.response?.data?.message || t('team.messages.changeRoleFailed'));
         }
     };
 
-    // Handle bulk change role
     const handleBulkChangeRole = async (newRoleId: number) => {
         if (selectedRowKeys.length === 0) {
-            message.warning('Vui lòng chọn thành viên');
+            message.warning(t('team.bulkActions.selectMembers'));
             return;
         }
 
@@ -147,17 +147,19 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => 
             });
 
             if (result.success > 0) {
-                message.success(`Đã thay đổi role cho ${result.success}/${result.total} thành viên`);
+                message.success(t('team.messages.changeRoleMultipleSuccess', {
+                    success: result.success,
+                    total: result.total
+                }));
                 setSelectedRowKeys([]);
                 fetchData();
             }
         } catch (error) {
             console.error('Error changing roles:', error);
-            message.error('Không thể thay đổi role');
+            message.error(t('team.messages.changeRoleFailed'));
         }
     };
 
-    // Filter members
     const filteredMembers = members.filter((member) => {
         const matchSearch =
             !searchText ||
@@ -170,7 +172,6 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => 
         return matchSearch && matchRole;
     });
 
-    // Get role badge color
     const getRoleBadgeColor = (roleName: string) => {
         if (roleName.toLowerCase().includes('admin')) return 'red';
         if (roleName.toLowerCase().includes('member')) return 'blue';
@@ -178,10 +179,9 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => 
         return 'purple';
     };
 
-    // Table columns
     const columns: ColumnsType<TeamMember> = [
         {
-            title: 'Thành viên',
+            title: t('team.table.member'),
             key: 'member',
             width: 250,
             render: (_, record) => (
@@ -210,27 +210,27 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => 
             ),
         },
         {
-            title: 'Username',
+            title: t('team.table.username'),
             dataIndex: ['employee', 'username'],
             key: 'username',
             width: 120,
         },
         {
-            title: 'Department',
+            title: t('team.table.department'),
             dataIndex: ['employee', 'department'],
             key: 'department',
             width: 150,
             render: (text) => text || '-',
         },
         {
-            title: 'Position',
+            title: t('team.table.position'),
             dataIndex: ['employee', 'position'],
             key: 'position',
             width: 150,
             render: (text) => text || '-',
         },
         {
-            title: 'Role',
+            title: t('team.table.role'),
             key: 'role',
             width: 150,
             render: (_, record) => (
@@ -251,12 +251,14 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => 
             ),
         },
         {
-            title: 'Assigned By',
+            title: t('team.table.assignedBy'),
             key: 'assigned_by',
             width: 150,
             render: (_, record) =>
                 record.assigned_by ? (
-                    <Tooltip title={`Assigned on ${dayjs(record.assigned_at).format('DD/MM/YYYY HH:mm')}`}>
+                    <Tooltip title={t('team.table.assignedOn', {
+                        date: dayjs(record.assigned_at).format('DD/MM/YYYY HH:mm')
+                    })}>
                         <Text type="secondary">{record.assigned_by.full_name}</Text>
                     </Tooltip>
                 ) : (
@@ -264,7 +266,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => 
                 ),
         },
         {
-            title: 'Joined Date',
+            title: t('team.table.joinedDate'),
             dataIndex: 'assigned_at',
             key: 'assigned_at',
             width: 120,
@@ -272,17 +274,17 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => 
             sorter: (a, b) => dayjs(a.assigned_at).unix() - dayjs(b.assigned_at).unix(),
         },
         {
-            title: 'Actions',
+            title: t('team.table.actions'),
             key: 'actions',
             width: 80,
             fixed: 'right',
             render: (_, record) => (
                 <Popconfirm
-                    title="Xóa thành viên này?"
-                    description="Thành viên sẽ bị xóa khỏi project"
+                    title={t('team.confirm.removeTitle')}
+                    description={t('team.confirm.removeDescription')}
                     onConfirm={() => handleRemove(record.employee_id)}
-                    okText="Xóa"
-                    cancelText="Hủy"
+                    okText={t('team.confirm.remove')}
+                    cancelText={t('team.confirm.cancel')}
                     okButtonProps={{ danger: true }}
                 >
                     <Button type="text" danger icon={<DeleteOutlined />} size="small" />
@@ -291,10 +293,9 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => 
         },
     ];
 
-    // Bulk actions menu
     const bulkActionsMenu = (
         <Menu>
-            <Menu.SubMenu key="change-role" title="Đổi role" icon={<EditOutlined />}>
+            <Menu.SubMenu key="change-role" title={t('team.bulkActions.changeRole')} icon={<EditOutlined />}>
                 {roles.map((role) => (
                     <Menu.Item
                         key={role.id}
@@ -317,7 +318,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => 
                     }
                 }}
             >
-                Xóa đã chọn
+                {t('team.bulkActions.removeSelected')}
             </Menu.Item>
         </Menu>
     );
@@ -331,7 +332,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => 
                         <Col span={6}>
                             <Card>
                                 <Statistic
-                                    title="Tổng thành viên"
+                                    title={t('team.statistics.totalMembers')}
                                     value={statistics.total_members}
                                     prefix={<TeamOutlined />}
                                     valueStyle={{ color: '#1890ff' }}
@@ -379,7 +380,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => 
                             }}
                         >
                             <Title level={3} style={{ margin: 0 }}>
-                                <TeamOutlined /> Team Management
+                                <TeamOutlined /> {t('team.title')}
                             </Title>
                             <Space>
                                 <Button
@@ -387,14 +388,14 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => 
                                     onClick={fetchData}
                                     loading={loading}
                                 >
-                                    Làm mới
+                                    {t('team.refresh')}
                                 </Button>
                                 <Button
                                     type="primary"
                                     icon={<UserAddOutlined />}
                                     onClick={() => setAddModalVisible(true)}
                                 >
-                                    Thêm thành viên
+                                    {t('team.addMember')}
                                 </Button>
                             </Space>
                         </div>
@@ -402,7 +403,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => 
                         {/* Filters */}
                         <Space size="middle" wrap>
                             <Input
-                                placeholder="Tìm kiếm thành viên..."
+                                placeholder={t('team.search.placeholder')}
                                 prefix={<SearchOutlined />}
                                 style={{ width: 300 }}
                                 value={searchText}
@@ -410,7 +411,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => 
                                 allowClear
                             />
                             <Select
-                                placeholder="Lọc theo role"
+                                placeholder={t('team.search.filterByRole')}
                                 style={{ width: 200 }}
                                 value={filterRole}
                                 onChange={setFilterRole}
@@ -431,7 +432,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => 
                                     <Badge count={selectedRowKeys.length} offset={[-5, 0]}>
                                         <Dropdown overlay={bulkActionsMenu} trigger={['click']}>
                                             <Button icon={<MoreOutlined />}>
-                                                Thao tác với {selectedRowKeys.length} người
+                                                {t('team.bulkActions.title', { count: selectedRowKeys.length })}
                                             </Button>
                                         </Dropdown>
                                     </Badge>
@@ -439,7 +440,10 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => 
                             )}
 
                             <Typography.Text type="secondary" style={{ marginLeft: 'auto' }}>
-                                Hiển thị: {filteredMembers.length} / {members.length} thành viên
+                                {t('team.search.showing', {
+                                    filtered: filteredMembers.length,
+                                    total: members.length
+                                })}
                             </Typography.Text>
                         </Space>
 
@@ -457,7 +461,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ projectId }) => 
                             pagination={{
                                 pageSize: 10,
                                 showSizeChanger: true,
-                                showTotal: (total) => `Tổng ${total} thành viên`,
+                                showTotal: (total) => t('team.pagination.total', { count: total }),
                             }}
                             scroll={{ x: 1200 }}
                         />

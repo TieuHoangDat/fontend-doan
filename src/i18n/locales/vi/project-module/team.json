@@ -1,0 +1,94 @@
+{
+    "team": {
+      "title": "Quản lý Nhóm",
+      "addMember": "Thêm thành viên",
+      "addMemberToProject": "Thêm thành viên vào Dự án",
+      "removeMember": "Xóa thành viên",
+      "changeRole": "Đổi vai trò",
+      "refresh": "Làm mới",
+      "loading": "Đang tải dữ liệu nhóm...",
+      "noMembers": "Không có thành viên",
+      
+      "statistics": {
+        "totalMembers": "Tổng thành viên",
+        "membersByRole": "Thành viên theo vai trò"
+      },
+      
+      "table": {
+        "member": "Thành viên",
+        "username": "Tên đăng nhập",
+        "department": "Phòng ban",
+        "position": "Vị trí",
+        "role": "Vai trò",
+        "assignedBy": "Người gán",
+        "joinedDate": "Ngày tham gia",
+        "actions": "Thao tác",
+        "assignedOn": "Gán vào {{date}}"
+      },
+      
+      "search": {
+        "placeholder": "Tìm kiếm thành viên...",
+        "filterByRole": "Lọc theo vai trò",
+        "showing": "Hiển thị: {{filtered}} / {{total}} thành viên"
+      },
+      
+      "bulkActions": {
+        "title": "Thao tác với {{count}} người",
+        "changeRole": "Đổi vai trò",
+        "removeSelected": "Xóa đã chọn",
+        "selectMembers": "Vui lòng chọn thành viên"
+      },
+      
+      "addModal": {
+        "single": "Thêm 1 người",
+        "multiple": "Thêm nhiều người",
+        "employee": "Nhân viên",
+        "employeePlaceholder": "Chọn nhân viên",
+        "employeeRequired": "Vui lòng chọn nhân viên",
+        "role": "Vai trò",
+        "rolePlaceholder": "Chọn vai trò",
+        "roleRequired": "Vui lòng chọn vai trò",
+        "selectRoleForAll": "Chọn vai trò cho tất cả:",
+        "selectEmployees": "Chọn nhân viên ({{count}} đã chọn):",
+        "selected": "Đã chọn",
+        "noEmployees": "Không còn nhân viên nào để thêm",
+        "addCount": "Thêm {{count}} người",
+        "default": "Mặc định"
+      },
+      
+      "confirm": {
+        "removeTitle": "Xóa thành viên này?",
+        "removeDescription": "Thành viên sẽ bị xóa khỏi dự án",
+        "remove": "Xóa",
+        "cancel": "Hủy"
+      },
+      
+      "messages": {
+        "loadFailed": "Không thể tải dữ liệu nhóm",
+        "addSuccess": "Đã thêm thành viên",
+        "addMultipleSuccess": "Đã thêm {{success}}/{{total}} thành viên",
+        "addFailed": "Không thể thêm thành viên",
+        "addNoneFailed": "Không thể thêm thành viên nào",
+        "removeSuccess": "Đã xóa thành viên",
+        "removeMultipleSuccess": "Đã xóa {{success}}/{{total}} thành viên",
+        "removeFailed": "Không thể xóa thành viên",
+        "changeRoleSuccess": "Đã thay đổi vai trò",
+        "changeRoleMultipleSuccess": "Đã thay đổi vai trò cho {{success}}/{{total}} thành viên",
+        "changeRoleFailed": "Không thể thay đổi vai trò",
+        "memberExists": "Thành viên này đã có trong dự án",
+        "selectAtLeastOne": "Vui lòng chọn ít nhất một thành viên",
+        "selectRole": "Vui lòng chọn vai trò",
+        "loadDataFailed": "Không thể tải dữ liệu"
+      },
+      
+      "pagination": {
+        "total": "Tổng {{count}} thành viên"
+      },
+      
+      "buttons": {
+        "add": "Thêm",
+        "cancel": "Hủy",
+        "close": "Đóng"
+      }
+    }
+  }

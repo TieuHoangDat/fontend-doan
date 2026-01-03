@@ -42,14 +42,13 @@ import { dropTargetForExternal } from '@atlaskit/pragmatic-drag-and-drop/externa
 import { Box, Grid, Stack, xcss, Inline, Text } from '@atlaskit/primitives';
 import { token } from '@atlaskit/tokens';
 
-import { type ColumnType, type Issue } from '../../data/people';
-
 import { useBoardContext } from './board-context';
 import { useColumnContext } from './column-context';
 import { IssueEditModal } from '../../../../../EditForm/IssueEditModal';
 import { EpicTag } from '../../../../../../epic/EpicTag';
 import { IssueTypeIcon } from './IssueTypeIcon';
 import { PriorityIcon } from './PriorityIcon';
+import { Issue } from './column';
 
 type State =
 	| { type: 'idle' }

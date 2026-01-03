@@ -1,5 +1,8 @@
+'use client';
+
 import React, { useState } from 'react';
 import { Modal, Collapse, Checkbox, message, Space, Alert, Tag } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { AssignPermissionDto, Permission } from '@/lib/api/services/project-module/project-role.service';
 import { PERMISSION_GROUPS } from '@/lib/api/services/project-module/permissions';
 
@@ -24,6 +27,7 @@ export const AssignPermissionsModal: React.FC<AssignPermissionsModalProps> = ({
     onSubmit,
     onRemove,
 }) => {
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [processingPermissions, setProcessingPermissions] = useState<Set<string>>(new Set());
 
@@ -45,15 +49,18 @@ export const AssignPermissionsModal: React.FC<AssignPermissionsModalProps> = ({
                     action_key: actionKey,
                     recipient_type: 'ROLE',
                 }]);
-                message.success(`Permission assigned successfully`);
+                message.success(t('role.messages.permissionAssigned'));
             } else if (!checked && isCurrentlyAssigned) {
                 // Remove permission immediately
                 await onRemove(actionKey);
-                message.success(`Permission removed successfully`);
+                message.success(t('role.messages.permissionRemoved'));
             }
         } catch (error: any) {
-            message.error(error.response?.data?.message || `Failed to ${checked ? 'assign' : 'remove'} permission`);
-            // Error will cause the checkbox to revert since existingPermissions won't change
+            const action = checked ? 'assign' : 'remove';
+            message.error(
+                error.response?.data?.message || 
+                t('role.messages.permissionFailed', { action })
+            );
         } finally {
             // Remove from processing set
             setProcessingPermissions((prev) => {
@@ -80,21 +87,21 @@ export const AssignPermissionsModal: React.FC<AssignPermissionsModalProps> = ({
 
     return (
         <Modal
-            title={`Manage Permissions for "${roleName}"`}
+            title={t('role.permissions.title', { roleName })}
             open={visible}
             onCancel={onCancel}
-            footer={null} // Remove footer since we don't need Save button anymore
+            footer={null}
             width={800}
             bodyStyle={{ maxHeight: '70vh', overflowY: 'auto' }}
         >
             <Alert
-                message="Instant Permission Management"
+                message={t('role.permissions.instantManagement')}
                 description={
                     <div>
-                        <div>✓ <strong>Check</strong> to assign a permission (instant)</div>
-                        <div>✗ <strong>Uncheck</strong> to remove a permission (instant)</div>
+                        <div>{t('role.permissions.checkToAssign')}</div>
+                        <div>{t('role.permissions.uncheckToRemove')}</div>
                         <div style={{ marginTop: 8 }}>
-                            All changes are applied immediately.
+                            {t('role.permissions.changesApplied')}
                         </div>
                     </div>
                 }
@@ -105,9 +112,13 @@ export const AssignPermissionsModal: React.FC<AssignPermissionsModalProps> = ({
 
             <div style={{ marginBottom: 16 }}>
                 <Space>
-                    <Tag color="blue">Assigned: {getAssignedCount()}</Tag>
+                    <Tag color="blue">
+                        {t('role.permissions.assignedCount', { count: getAssignedCount() })}
+                    </Tag>
                     {processingPermissions.size > 0 && (
-                        <Tag color="orange">Processing: {processingPermissions.size}</Tag>
+                        <Tag color="orange">
+                            {t('role.permissions.processingCount', { count: processingPermissions.size })}
+                        </Tag>
                     )}
                 </Space>
             </div>
@@ -135,7 +146,7 @@ export const AssignPermissionsModal: React.FC<AssignPermissionsModalProps> = ({
                                             border: '1px solid #f0f0f0',
                                             borderRadius: 4,
                                             backgroundColor: isChecked
-                                                ? '#f6ffed' // Light green for assigned
+                                                ? '#f6ffed'
                                                 : '#fafafa',
                                             opacity: isLoadingThis ? 0.6 : 1,
                                         }}
@@ -157,7 +168,7 @@ export const AssignPermissionsModal: React.FC<AssignPermissionsModalProps> = ({
                                                         color="success"
                                                         style={{ marginLeft: 8 }}
                                                     >
-                                                        Assigned
+                                                        {t('role.permissions.assignedTag')}
                                                     </Tag>
                                                 )}
                                                 {isLoadingThis && (
@@ -165,7 +176,7 @@ export const AssignPermissionsModal: React.FC<AssignPermissionsModalProps> = ({
                                                         color="processing"
                                                         style={{ marginLeft: 8 }}
                                                     >
-                                                        Processing...
+                                                        {t('role.permissions.processingTag')}
                                                     </Tag>
                                                 )}
                                             </Checkbox>

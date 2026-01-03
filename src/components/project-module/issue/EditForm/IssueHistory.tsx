@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import {
     Card,
@@ -16,13 +18,14 @@ import {
     UserOutlined,
     ClockCircleOutlined,
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { issueService, IssueChangeHistory } from '@/lib/api/services/project-module/issue.service';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/vi';
+import 'dayjs/locale/en';
 
 dayjs.extend(relativeTime);
-dayjs.locale('vi');
 
 const { Text } = Typography;
 
@@ -30,29 +33,6 @@ type IssueHistoryProps = {
     issueId: number;
 };
 
-// Map field names to Vietnamese labels
-const FIELD_LABELS: Record<string, string> = {
-    issue_created: 'Tạo issue',
-    issue_deleted: 'Xóa issue',
-    issue_type_id: 'Loại issue',
-    current_status_id: 'Trạng thái',
-    epic_link_id: 'Epic',
-    reporter_id: 'Người báo cáo',
-    summary: 'Tóm tắt',
-    description: 'Mô tả',
-    story_points: 'Story points',
-    original_estimate_seconds: 'Ước tính ban đầu',
-    time_spent_seconds: 'Thời gian đã dùng',
-    resolution: 'Giải pháp',
-    assignee_added: 'Thêm assignee',
-    assignee_removed: 'Xóa assignee',
-    watcher_added: 'Thêm watcher',
-    watcher_removed: 'Xóa watcher',
-    link_created: 'Tạo liên kết',
-    link_deleted: 'Xóa liên kết',
-};
-
-// Get tag color based on field name
 const getFieldColor = (fieldName: string): string => {
     if (fieldName.includes('created') || fieldName.includes('added')) {
         return 'green';
@@ -66,7 +46,6 @@ const getFieldColor = (fieldName: string): string => {
     return 'default';
 };
 
-// Format time value (seconds to hours/minutes)
 const formatTimeValue = (seconds: string | null): string => {
     if (!seconds || seconds === 'null') return '';
     const secs = parseInt(seconds, 10);
@@ -81,24 +60,28 @@ const formatTimeValue = (seconds: string | null): string => {
     return `${minutes}m`;
 };
 
-// Format change value for display
-const formatValue = (fieldName: string, value: string | null): React.ReactNode => {
-    if (!value || value === 'null') {
-        return <Text type="secondary" italic>(trống)</Text>;
-    }
-
-    // Format time fields
-    if (fieldName.includes('seconds')) {
-        const formatted = formatTimeValue(value);
-        return formatted || value;
-    }
-
-    return value;
-};
-
 export const IssueHistory: React.FC<IssueHistoryProps> = ({ issueId }) => {
+    const { t, i18n } = useTranslation();
     const [history, setHistory] = useState<IssueChangeHistory[]>([]);
     const [loading, setLoading] = useState(false);
+
+    // Set dayjs locale based on i18n language
+    useEffect(() => {
+        dayjs.locale(i18n.language === 'vi' ? 'vi' : 'en');
+    }, [i18n.language]);
+
+    const formatValue = (fieldName: string, value: string | null): React.ReactNode => {
+        if (!value || value === 'null') {
+            return <Text type="secondary" italic>{t('issue.history.empty')}</Text>;
+        }
+
+        if (fieldName.includes('seconds')) {
+            const formatted = formatTimeValue(value);
+            return formatted || value;
+        }
+
+        return value;
+    };
 
     const fetchHistory = async () => {
         try {
@@ -107,7 +90,7 @@ export const IssueHistory: React.FC<IssueHistoryProps> = ({ issueId }) => {
             setHistory(data);
         } catch (error) {
             console.error('Error fetching history:', error);
-            message.error('Không thể tải lịch sử thay đổi');
+            message.error(t('issue.history.loadFailed'));
         } finally {
             setLoading(false);
         }
@@ -120,7 +103,7 @@ export const IssueHistory: React.FC<IssueHistoryProps> = ({ issueId }) => {
     }, [issueId]);
 
     const renderChangeContent = (change: IssueChangeHistory) => {
-        const fieldLabel = FIELD_LABELS[change.field_name] || change.field_name;
+        const fieldLabel = t(`issue.history.fieldLabels.${change.field_name}`, change.field_name);
         const hasChange = change.old_value || change.new_value;
 
         return (
@@ -145,7 +128,7 @@ export const IssueHistory: React.FC<IssueHistoryProps> = ({ issueId }) => {
                     <div style={{ marginLeft: 32, fontSize: 12 }}>
                         {change.old_value && (
                             <div>
-                                <Text type="secondary">Từ: </Text>
+                                <Text type="secondary">{t('issue.history.from')} </Text>
                                 <Text delete type="secondary">
                                     {formatValue(change.field_name, change.old_value)}
                                 </Text>
@@ -153,7 +136,7 @@ export const IssueHistory: React.FC<IssueHistoryProps> = ({ issueId }) => {
                         )}
                         {change.new_value && (
                             <div>
-                                <Text type="secondary">Đến: </Text>
+                                <Text type="secondary">{t('issue.history.to')} </Text>
                                 <Text strong style={{ color: '#52c41a' }}>
                                     {formatValue(change.field_name, change.new_value)}
                                 </Text>
@@ -180,7 +163,7 @@ export const IssueHistory: React.FC<IssueHistoryProps> = ({ issueId }) => {
             title={
                 <Space>
                     <HistoryOutlined />
-                    <Text strong>Lịch sử thay đổi</Text>
+                    <Text strong>{t('issue.history.title')}</Text>
                     {history.length > 0 && (
                         <Tag color="blue">{history.length}</Tag>
                     )}
@@ -192,7 +175,7 @@ export const IssueHistory: React.FC<IssueHistoryProps> = ({ issueId }) => {
                 {history.length === 0 ? (
                     <Empty
                         image={Empty.PRESENTED_IMAGE_SIMPLE}
-                        description="Chưa có lịch sử thay đổi"
+                        description={t('issue.history.noHistory')}
                         style={{ padding: '20px 0' }}
                     />
                 ) : (

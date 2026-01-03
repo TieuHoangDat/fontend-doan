@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import {
     Select,
@@ -18,6 +20,7 @@ import {
     PlusOutlined,
     SearchOutlined,
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { issueService, IssueLinksData } from '@/lib/api/services/project-module/issue.service';
 
 const { Option } = Select;
@@ -35,7 +38,6 @@ type LinkedIssue = {
     };
 };
 
-
 type Issue = {
     id: number;
     issue_code: string;
@@ -50,20 +52,20 @@ type IssueLinksProps = {
     projectId?: number;
 };
 
-// Link type labels
-const LINK_TYPE_LABELS: Record<string, { outgoing: string; incoming: string; color: string }> = {
-    blocks: { outgoing: 'Blocks', incoming: 'Blocked by', color: 'red' },
-    is_blocked_by: { outgoing: 'Blocked by', incoming: 'Blocks', color: 'red' },
-    relates_to: { outgoing: 'Relates to', incoming: 'Relates to', color: 'blue' },
-    duplicates: { outgoing: 'Duplicates', incoming: 'Duplicated by', color: 'orange' },
-    is_duplicated_by: { outgoing: 'Duplicated by', incoming: 'Duplicates', color: 'orange' },
-    causes: { outgoing: 'Causes', incoming: 'Caused by', color: 'purple' },
-    is_caused_by: { outgoing: 'Caused by', incoming: 'Causes', color: 'purple' },
-    parent_of: { outgoing: 'Parent of', incoming: 'Child of', color: 'green' },
-    child_of: { outgoing: 'Child of', incoming: 'Parent of', color: 'green' },
+const LINK_TYPE_CONFIG: Record<string, { color: string }> = {
+    blocks: { color: 'red' },
+    is_blocked_by: { color: 'red' },
+    relates_to: { color: 'blue' },
+    duplicates: { color: 'orange' },
+    is_duplicated_by: { color: 'orange' },
+    causes: { color: 'purple' },
+    is_caused_by: { color: 'purple' },
+    parent_of: { color: 'green' },
+    child_of: { color: 'green' },
 };
 
 export const IssueLinks: React.FC<IssueLinksProps> = ({ issueId, projectId = 1 }) => {
+    const { t } = useTranslation();
     const [links, setLinks] = useState<IssueLinksData>({ outgoing: [], incoming: [] });
     const [loading, setLoading] = useState(false);
     const [adding, setAdding] = useState(false);
@@ -73,7 +75,6 @@ export const IssueLinks: React.FC<IssueLinksProps> = ({ issueId, projectId = 1 }
     const [selectedLinkType, setSelectedLinkType] = useState<string>('relates_to');
     const [selectedIssueId, setSelectedIssueId] = useState<number | null>(null);
 
-    // Fetch links
     const fetchLinks = async () => {
         try {
             setLoading(true);
@@ -81,13 +82,12 @@ export const IssueLinks: React.FC<IssueLinksProps> = ({ issueId, projectId = 1 }
             setLinks(data);
         } catch (error) {
             console.error('Error fetching links:', error);
-            message.error('Không thể tải danh sách links');
+            message.error(t('issue.links.loadFailed'));
         } finally {
             setLoading(false);
         }
     };
 
-    // Search issues
     const searchIssues = async (term: string) => {
         if (!term || term.length < 2) {
             setAvailableIssues([]);
@@ -98,7 +98,6 @@ export const IssueLinks: React.FC<IssueLinksProps> = ({ issueId, projectId = 1 }
             setSearchLoading(true);
             const data = await issueService.getAll({ search: term, projectId });
 
-            // Filter out current issue and already linked issues
             const linkedIssueIds = [
                 ...links.outgoing.map((l) => l.issue.id),
                 ...links.incoming.map((l) => l.issue.id),
@@ -110,23 +109,22 @@ export const IssueLinks: React.FC<IssueLinksProps> = ({ issueId, projectId = 1 }
             setAvailableIssues(filtered);
         } catch (error) {
             console.error('Error searching issues:', error);
-            message.error('Không thể tìm kiếm issues');
+            message.error(t('issue.links.searchFailed'));
         } finally {
             setSearchLoading(false);
         }
     };
 
-    // Add link
     const handleAddLink = async () => {
         if (!selectedIssueId) {
-            message.warning('Vui lòng chọn issue để link');
+            message.warning(t('issue.links.selectIssue'));
             return;
         }
 
         try {
             setAdding(true);
             await issueService.createLink(issueId, selectedIssueId, selectedLinkType);
-            message.success('Đã thêm link');
+            message.success(t('issue.links.addSuccess'));
             setSelectedIssueId(null);
             setSearchTerm('');
             setAvailableIssues([]);
@@ -134,24 +132,23 @@ export const IssueLinks: React.FC<IssueLinksProps> = ({ issueId, projectId = 1 }
         } catch (error: any) {
             console.error('Error adding link:', error);
             if (error.response?.status === 400) {
-                message.warning(error.response.data.message || 'Link này đã tồn tại');
+                message.warning(error.response.data.message || t('issue.links.linkExists'));
             } else {
-                message.error('Không thể thêm link');
+                message.error(t('issue.links.addFailed'));
             }
         } finally {
             setAdding(false);
         }
     };
 
-    // Remove link
     const handleRemoveLink = async (linkId: number) => {
         try {
             await issueService.deleteLink(issueId, linkId);
-            message.success('Đã xóa link');
+            message.success(t('issue.links.removeSuccess'));
             fetchLinks();
         } catch (error) {
             console.error('Error removing link:', error);
-            message.error('Không thể xóa link');
+            message.error(t('issue.links.removeFailed'));
         }
     };
 
@@ -161,13 +158,29 @@ export const IssueLinks: React.FC<IssueLinksProps> = ({ issueId, projectId = 1 }
         }
     }, [issueId]);
 
-    const renderLink = (link: LinkedIssue, direction: 'outgoing' | 'incoming') => {
-        const linkConfig = LINK_TYPE_LABELS[link.link_type] || {
-            outgoing: link.link_type,
-            incoming: link.link_type,
-            color: 'default',
+    const getLinkTypeLabel = (linkType: string, direction: 'outgoing' | 'incoming'): string => {
+        // Map inverse relationships for incoming
+        const inverseMap: Record<string, string> = {
+            blocks: 'is_blocked_by',
+            is_blocked_by: 'blocks',
+            duplicates: 'is_duplicated_by',
+            is_duplicated_by: 'duplicates',
+            causes: 'is_caused_by',
+            is_caused_by: 'causes',
+            parent_of: 'child_of',
+            child_of: 'parent_of',
         };
-        const label = direction === 'outgoing' ? linkConfig.outgoing : linkConfig.incoming;
+
+        const effectiveType = direction === 'incoming' && inverseMap[linkType] 
+            ? inverseMap[linkType] 
+            : linkType;
+
+        return t(`issue.links.linkTypes.${effectiveType}`, effectiveType);
+    };
+
+    const renderLink = (link: LinkedIssue, direction: 'outgoing' | 'incoming') => {
+        const config = LINK_TYPE_CONFIG[link.link_type] || { color: 'default' };
+        const label = getLinkTypeLabel(link.link_type, direction);
 
         return (
             <div
@@ -191,7 +204,7 @@ export const IssueLinks: React.FC<IssueLinksProps> = ({ issueId, projectId = 1 }
             >
                 <Space direction="vertical" size={2} style={{ flex: 1 }}>
                     <Space>
-                        <Tag color={linkConfig.color}>{label}</Tag>
+                        <Tag color={config.color}>{label}</Tag>
                         <Text strong style={{ fontSize: 13 }}>
                             {link.issue.issue_code}
                         </Text>
@@ -203,7 +216,7 @@ export const IssueLinks: React.FC<IssueLinksProps> = ({ issueId, projectId = 1 }
                         {link.issue.summary}
                     </Text>
                 </Space>
-                <Tooltip title="Xóa link">
+                <Tooltip title={t('issue.links.removeLink')}>
                     <CloseOutlined
                         style={{
                             cursor: 'pointer',
@@ -221,32 +234,29 @@ export const IssueLinks: React.FC<IssueLinksProps> = ({ issueId, projectId = 1 }
     return (
         <div>
             <Spin spinning={loading}>
-                {/* Add Link Section */}
                 <div style={{ marginBottom: 16, padding: 12, background: '#fafafa', borderRadius: 6 }}>
                     <Text strong style={{ display: 'block', marginBottom: 12 }}>
-                        <PlusOutlined /> Thêm link mới
+                        <PlusOutlined /> {t('issue.links.addNewLink')}
                     </Text>
 
-                    {/* Link Type Select */}
                     <Select
                         style={{ width: '100%', marginBottom: 8 }}
                         value={selectedLinkType}
                         onChange={setSelectedLinkType}
                     >
-                        <Option value="relates_to">Relates to</Option>
-                        <Option value="blocks">Blocks</Option>
-                        <Option value="is_blocked_by">Is blocked by</Option>
-                        <Option value="duplicates">Duplicates</Option>
-                        <Option value="is_duplicated_by">Is duplicated by</Option>
-                        <Option value="causes">Causes</Option>
-                        <Option value="is_caused_by">Is caused by</Option>
-                        <Option value="parent_of">Parent of</Option>
-                        <Option value="child_of">Child of</Option>
+                        <Option value="relates_to">{t('issue.links.linkTypes.relates_to')}</Option>
+                        <Option value="blocks">{t('issue.links.linkTypes.blocks')}</Option>
+                        <Option value="is_blocked_by">{t('issue.links.linkTypes.is_blocked_by')}</Option>
+                        <Option value="duplicates">{t('issue.links.linkTypes.duplicates')}</Option>
+                        <Option value="is_duplicated_by">{t('issue.links.linkTypes.is_duplicated_by')}</Option>
+                        <Option value="causes">{t('issue.links.linkTypes.causes')}</Option>
+                        <Option value="is_caused_by">{t('issue.links.linkTypes.is_caused_by')}</Option>
+                        <Option value="parent_of">{t('issue.links.linkTypes.parent_of')}</Option>
+                        <Option value="child_of">{t('issue.links.linkTypes.child_of')}</Option>
                     </Select>
 
-                    {/* Issue Search */}
                     <Input
-                        placeholder="Tìm issue theo code hoặc summary..."
+                        placeholder={t('issue.links.searchPlaceholder')}
                         prefix={<SearchOutlined />}
                         value={searchTerm}
                         onChange={(e) => {
@@ -256,7 +266,6 @@ export const IssueLinks: React.FC<IssueLinksProps> = ({ issueId, projectId = 1 }
                         style={{ marginBottom: 8 }}
                     />
 
-                    {/* Search Results */}
                     {searchLoading ? (
                         <div style={{ textAlign: 'center', padding: 8 }}>
                             <Spin size="small" />
@@ -311,33 +320,30 @@ export const IssueLinks: React.FC<IssueLinksProps> = ({ issueId, projectId = 1 }
                         disabled={!selectedIssueId}
                         block
                     >
-                        Thêm link
+                        {t('issue.links.addLink')}
                     </Button>
                 </div>
 
                 <Divider style={{ margin: '16px 0' }} />
 
-                {/* Existing Links */}
                 <div>
                     {links.outgoing.length === 0 && links.incoming.length === 0 ? (
-                        <Empty description="Chưa có link nào" style={{ marginTop: 40 }} />
+                        <Empty description={t('issue.links.noLinks')} style={{ marginTop: 40 }} />
                     ) : (
                         <>
-                            {/* Outgoing Links */}
                             {links.outgoing.length > 0 && (
                                 <div style={{ marginBottom: 16 }}>
                                     <Text strong style={{ display: 'block', marginBottom: 8 }}>
-                                        <LinkOutlined /> Links từ issue này ({links.outgoing.length})
+                                        <LinkOutlined /> {t('issue.links.linkFrom')} ({links.outgoing.length})
                                     </Text>
                                     {links.outgoing.map((link) => renderLink(link, 'outgoing'))}
                                 </div>
                             )}
 
-                            {/* Incoming Links */}
                             {links.incoming.length > 0 && (
                                 <div>
                                     <Text strong style={{ display: 'block', marginBottom: 8 }}>
-                                        <LinkOutlined /> Links đến issue này ({links.incoming.length})
+                                        <LinkOutlined /> {t('issue.links.linkTo')} ({links.incoming.length})
                                     </Text>
                                     {links.incoming.map((link) => renderLink(link, 'incoming'))}
                                 </div>

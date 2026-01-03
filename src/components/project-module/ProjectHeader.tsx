@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Card, Tabs, Skeleton, Tag, Space, Typography, Avatar, Tooltip } from 'antd';
@@ -29,7 +31,6 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({ projectId }) => {
     const [project, setProject] = useState<Project | null>(null);
     const [loading, setLoading] = useState(true);
 
-    // Fetch project info
     useEffect(() => {
         const fetchProject = async () => {
             try {
@@ -48,7 +49,6 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({ projectId }) => {
         }
     }, [projectId]);
 
-    // Determine active tab based on pathname
     const getActiveTab = () => {
         if (pathname.includes('/summary')) return 'summary';
         if (pathname.includes('/sprints')) return 'sprint';
@@ -60,7 +60,6 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({ projectId }) => {
         return 'sprint';
     };
 
-    // Handle tab change
     const handleTabChange = (key: string) => {
         switch (key) {
             case 'summary':

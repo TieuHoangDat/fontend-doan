@@ -1,5 +1,8 @@
+'use client';
+
 import React, { useEffect } from 'react';
 import { Modal, Form, Input, message } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { CreateRoleDto, UpdateRoleDto } from '@/lib/api/services/project-module/project-role.service';
 import { ProjectRole } from '@/lib/api/services/project-module/project-role.service';
 
@@ -19,6 +22,7 @@ export const RoleModal: React.FC<RoleModalProps> = ({
     role,
     onSubmit,
 }) => {
+    const { t } = useTranslation();
     const [form] = Form.useForm();
     const [loading, setLoading] = React.useState(false);
 
@@ -44,7 +48,7 @@ export const RoleModal: React.FC<RoleModalProps> = ({
 
             await onSubmit(values);
             
-            message.success(role ? 'Role updated successfully' : 'Role created successfully');
+            message.success(role ? t('role.messages.updateSuccess') : t('role.messages.createSuccess'));
             form.resetFields();
             onSuccess();
         } catch (error: any) {
@@ -52,7 +56,7 @@ export const RoleModal: React.FC<RoleModalProps> = ({
                 // Validation error
                 return;
             }
-            message.error(error.response?.data?.message || 'An error occurred');
+            message.error(error.response?.data?.message || t('role.messages.genericError'));
         } finally {
             setLoading(false);
         }
@@ -62,12 +66,13 @@ export const RoleModal: React.FC<RoleModalProps> = ({
 
     return (
         <Modal
-            title={role ? 'Edit Role' : 'Create New Role'}
+            title={role ? t('role.editRole') : t('role.createRole')}
             open={visible}
             onOk={handleSubmit}
             onCancel={onCancel}
             confirmLoading={loading}
-            okText={role ? 'Update' : 'Create'}
+            okText={role ? t('role.buttons.update') : t('role.buttons.create')}
+            cancelText={t('role.buttons.cancel')}
             width={500}
         >
             <Form
@@ -76,35 +81,35 @@ export const RoleModal: React.FC<RoleModalProps> = ({
                 autoComplete="off"
             >
                 <Form.Item
-                    label="Role Name"
+                    label={t('role.form.roleName')}
                     name="role_name"
                     rules={[
-                        { required: true, message: 'Please enter role name' },
-                        { min: 2, message: 'Role name must be at least 2 characters' },
-                        { max: 50, message: 'Role name must not exceed 50 characters' },
+                        { required: true, message: t('role.form.roleNameRequired') },
+                        { min: 2, message: t('role.form.roleNameMin') },
+                        { max: 50, message: t('role.form.roleNameMax') },
                     ]}
                 >
                     <Input 
-                        placeholder="e.g., Developer, QA Tester, Designer"
+                        placeholder={t('role.form.roleNamePlaceholder')}
                         disabled={isDefaultRole ?? false}
                     />
                 </Form.Item>
 
                 {isDefaultRole && (
                     <div style={{ marginTop: -16, marginBottom: 16, color: '#faad14', fontSize: 12 }}>
-                        ⚠️ Cannot rename default roles
+                        {t('role.form.cannotRenameDefault')}
                     </div>
                 )}
 
                 <Form.Item
-                    label="Description"
+                    label={t('role.form.description')}
                     name="role_description"
                     rules={[
-                        { max: 200, message: 'Description must not exceed 200 characters' },
+                        { max: 200, message: t('role.form.descriptionMax') },
                     ]}
                 >
                     <Input.TextArea
-                        placeholder="Describe the responsibilities of this role"
+                        placeholder={t('role.form.descriptionPlaceholder')}
                         rows={4}
                     />
                 </Form.Item>
